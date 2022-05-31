@@ -1,0 +1,22 @@
+[tool.poetry]
+name = "challenges-deep-cognitive-decoding"
+version = "0.1.0"
+description = ""
+authors = ["athms"]
+
+[tool.poetry.dependencies]
+python = "^3.7"
+wandb = "^0.12.11"
+captum = "^0.5.0"
+torch = "^1.10.2"
+nilearn = "^0.9.0"
+seaborn = "^0.11.2"
+gitdir = "^1.2.5"
+ray = {extras = ["tune"], version = "^1.11.0"}
+zennit = "^0.4.5"
+
+[tool.poetry.dev-dependencies]
+
+[build-system]
+requires = ["poetry-core>=1.0.0"]
+build-backend = "poetry.core.masonry.api"
