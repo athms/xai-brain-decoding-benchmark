@@ -312,7 +312,9 @@ def compute_trial_level_BOLD_glm_maps(args: argparse.ArgumentParser=None) -> Non
 
 
 def get_argparse() -> argparse.Namespace:
-    parser = argparse.ArgumentParser()
+    parser = argparse.ArgumentParser(
+        description='compute trial-level BOLD GLM maps for HCP tasks.'
+    )
     parser.add_argument(
         "--task",
         type=str,

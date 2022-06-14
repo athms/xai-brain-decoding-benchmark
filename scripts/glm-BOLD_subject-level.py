@@ -202,7 +202,7 @@ def make_subject_level_design_matrix(subject_data: pd.DataFrame) -> pd.DataFrame
 
 def get_argsparse() -> argparse.ArgumentParser:
     parser = argparse.ArgumentParser(
-        description='data preprocessing'
+        description='compute subject-level BOLD GLM maps'
     )
     parser.add_argument(
         '--task',
@@ -225,11 +225,11 @@ def get_argsparse() -> argparse.ArgumentParser:
     parser.add_argument(
         '--subject-level-maps-dir',
         metavar='DIR',
-        default='results/glm/BOLD/subject_level/task-WM',
+        default='results/glm/BOLD/task-WM/subject_level',
         type=str,
         required=False,
         help='path where subject-level BOLD GLM maps are stored '
-             '(default: results/glm/BOLD/subject_level/task-WM)'
+             '(default: results/glm/BOLD/task-WM/subject_level)'
     )
     parser.add_argument(
         '--plot-stat-maps',
