@@ -589,8 +589,11 @@ def get_argparse(parser: argparse.ArgumentParser=None) -> argparse.ArgumentParse
         '--wandb-entity',
         metavar='STR',
         type=str,
-        required=True,
+        default='anonymous',
+        required=False,
         help='entity used for wandb logging'
+             'only needed if report-to is wandb'
+             '(default: anonymous)'
     )
     parser.add_argument(
         '--wandb-project',
@@ -598,6 +601,7 @@ def get_argparse(parser: argparse.ArgumentParser=None) -> argparse.ArgumentParse
         default='interpreting-brain-decoding-models',
         type=str,
         help='project used for wandb logging '
+             'only needed if report-to is wandb'
              '(default: interpreting-brain-decoding-models)'
     )
     parser.add_argument(
@@ -607,6 +611,7 @@ def get_argparse(parser: argparse.ArgumentParser=None) -> argparse.ArgumentParse
         choices=('online', 'offline', 'disabled'),
         type=str,
         help='mode used for wandb logging '
+             'only needed if report-to is wandb'
              'one of [online, offline, disabled] (default: online)'
     )
     parser.add_argument(
