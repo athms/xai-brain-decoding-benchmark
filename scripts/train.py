@@ -267,7 +267,7 @@ def train_run(
         config["validation_idx"] = idx[(config["n_validation_images"]*config["fold"]):(config["n_validation_images"]*(config["fold"]+1))]
     else:
         print(
-            f'! Using {percentage_validation*100}% of trainnig data (N: {config["n_train_images"]}) for validation'
+            f'! Using {percentage_validation*100}% of trainnig data (Total N: {config["n_train_images"]}) for validation'
         )
         config["validation_idx"] = np.random.choice(
             idx,
@@ -433,7 +433,7 @@ def get_argparse(parser: argparse.ArgumentParser=None) -> argparse.ArgumentParse
     
     if parser is None:
         parser = argparse.ArgumentParser(
-            description='train CNN for given task'
+            description='train 3D-CNN for given task'
         )
 
     parser.add_argument(
