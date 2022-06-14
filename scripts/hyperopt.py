@@ -6,7 +6,7 @@ from train import train
 
 
 def hyperopt() -> None:
-    """Script's main function; runs hyperoptimization of 3D-CNN for given task."""
+    """Script's main function; runs 3D-CNN hyperoptimization with tune for given task."""
 
     hyperopt_args = vars(get_argsparse().parse_args())
 
@@ -21,35 +21,21 @@ def hyperopt() -> None:
         "data_dir": hyperopt_args["data_dir"],
         "num_epochs": 40,
         "num_runs": 1,
-        "run": -1,
         "num_folds": 3,
-        "fold": -1,
         "log_dir": hyperopt_args["log_dir"],
-        "run_group_name": "none",
-        "wandb_entity": "athms",
-        "wandb_project": "interpretability-comparison",
-        "wandb_mode": "offline",
         "report_to": "tune",
-        "smoke_test": False,
-        "verbose": False,
-        "seed": 1,
-        "model_config": "none"
+        "seed": 1234
     }
 
-    result = ray.tune.run(
+    _ = ray.tune.run(
         train,
         resources_per_trial={
             "cpu": hyperopt_args["cpus_per_trial"],
             "gpu": hyperopt_args["gpus_per_trial"]
         },
         config=config,
-        local_dir="results/hyperopt",
+        local_dir=hyperopt_args["log_dir"],
     )
-
-    best_trial = result.get_best_trial("loss", "min", "last")
-    print(f"Best trial config: {best_trial.config}")
-    print(f"Best trial final validation loss: {best_trial.last_result['loss']}")
-    print(f"Best trial final validation accuracy: {best_trial.last_result['accuracy']}")
 
     return None
 
@@ -58,7 +44,7 @@ def get_argsparse(parser: argparse.ArgumentParser=None) -> argparse.ArgumentPars
     
     if parser is None:
         parser = argparse.ArgumentParser(
-            description='hyperopt CNN for given task'
+            description='hyperopt 3D-CNN for given task'
         )
 
     parser.add_argument(
@@ -66,18 +52,16 @@ def get_argsparse(parser: argparse.ArgumentParser=None) -> argparse.ArgumentPars
         metavar='STR',
         default='WM',
         type=str,
-        help='task for which CNN is optimized '
+        help='task for which 3D-CNN is optimized '
              '(default: WM)'
     )
-
     parser.add_argument(
         '--data-dir',
         metavar='DIR',
         default='data/task-WM/trial_images',
         type=str,
-        help='path tp trial-level BOLD GLM maps'
+        help='path to trial-level BOLD GLM maps'
     )
-
     parser.add_argument(
         '--log-dir',
         metavar='DIR',
@@ -85,21 +69,19 @@ def get_argsparse(parser: argparse.ArgumentParser=None) -> argparse.ArgumentPars
         type=str,
         help='path where models and logs are stored'
     )
-
     parser.add_argument(
         '--cpus-per-trial',
         metavar='N',
         default=2,
         type=int,
-        help='number of CPUs per tune hyperopt trial'
+        help='number of CPUs per hyperopt trial'
     )
-
     parser.add_argument(
         '--gpus-per-trial',
         metavar='N',
         default=1,
         type=float,
-        help='number of GPUs per tune hyperopt trial'
+        help='number of GPUs per hyperopt trial'
     )
 
     return parser
