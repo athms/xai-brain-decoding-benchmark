@@ -230,7 +230,7 @@ def attribute_w_method(
 
     image.requires_grad = True
 
-    if 'LRP' in name_attribution_method:
+    if name_attribution_method == 'LRP':
         grad_dummy = torch.eye(num_labels)[[label]]
 
         if torch.cuda.is_available():
@@ -273,7 +273,11 @@ def attribute_w_method(
 
     elif name_attribution_method == 'DeepLiftShap':
         attributer = attribution_method(model)
-        baselines_idx = np.random.choice(test_images.shape[0], 50, replace=False)
+        baselines_idx = np.random.choice(
+            test_images.shape[0],
+            50,
+            replace=False
+        )
         attribution = attributer.attribute(
             inputs=image,
             target=label,
@@ -282,10 +286,14 @@ def attribute_w_method(
 
     elif name_attribution_method == 'GuidedGradCam':
         last_conv_layer = None
+        
         for module in model.modules():
+            
             for layer in module.modules():
+                
                 if isinstance(layer, torch.nn.Conv3d):
                     last_conv_layer = layer
+        
         attributer = attribution_method(model, last_conv_layer)
         attribution = attributer.attribute(
             inputs=image,
