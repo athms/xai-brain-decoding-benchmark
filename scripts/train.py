@@ -669,12 +669,9 @@ def get_argparse(parser: argparse.ArgumentParser=None) -> argparse.ArgumentParse
     return parser
 
 
-def get_config(config: Dict=None):
-    """Generates / Cleanes-up config dictionary"""
-
-    if config is None:
-        config = vars(get_argparse().parse_args())
-
+def get_config():
+    """Generates config dictionary"""
+    config = vars(get_argparse().parse_args())
     config["verbose"] = config["verbose"] == 'True'
     config["permute_labels"] = config["permute_labels"] == 'True'
     config["device"] = "cuda:0" if torch.cuda.is_available() else "cpu"
