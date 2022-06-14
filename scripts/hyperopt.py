@@ -11,6 +11,7 @@ def hyperopt() -> None:
 
     hyperopt_config = vars(get_argparse().parse_args())
     train_config = train.make_config()
+    train_config['run_group_name'] = "none" # reset so that it is autonatically generated in call to train.train()
 
     config = {
         "num_hidden_layers": ray.tune.grid_search([3, 4, 5]),
