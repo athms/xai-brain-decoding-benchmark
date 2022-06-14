@@ -582,6 +582,7 @@ def get_argparse(parser: argparse.ArgumentParser=None) -> argparse.ArgumentParse
         default='none',
         type=str,
         choices=('none', 'wandb', 'tune'),
+        required=False,
         help='whether to report training results to wandb, tune or none '
              '(default: none)'
     )
@@ -600,6 +601,7 @@ def get_argparse(parser: argparse.ArgumentParser=None) -> argparse.ArgumentParse
         metavar='STR',
         default='interpreting-brain-decoding-models',
         type=str,
+        required=False,
         help='project used for wandb logging '
              'only needed if report-to is wandb'
              '(default: interpreting-brain-decoding-models)'
@@ -610,6 +612,7 @@ def get_argparse(parser: argparse.ArgumentParser=None) -> argparse.ArgumentParse
         default='online',
         choices=('online', 'offline', 'disabled'),
         type=str,
+        required=False,
         help='mode used for wandb logging '
              'only needed if report-to is wandb'
              'one of [online, offline, disabled] (default: online)'
@@ -620,6 +623,7 @@ def get_argparse(parser: argparse.ArgumentParser=None) -> argparse.ArgumentParse
         default='False',
         choices=('True', 'False'),
         type=str,
+        required=False,
         help='whether to run training in smoke-test mode '
              'used for testing purposes (default: False)'
     )
@@ -629,6 +633,7 @@ def get_argparse(parser: argparse.ArgumentParser=None) -> argparse.ArgumentParse
         default='True',
         choices=('True', 'False'),
         type=str,
+        required=False,
         help='actively comment training? '
              '(default: True)'
     )
