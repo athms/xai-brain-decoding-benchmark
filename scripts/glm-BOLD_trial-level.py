@@ -133,7 +133,8 @@ def make_design_matrix(
     return dm
 
 
-def compute_trial_level_glms(args: argparse.ArgumentParser=None) -> None:
+def compute_trial_level_BOLD_glm_maps(args: argparse.ArgumentParser=None) -> None:
+    """Script's main function; Computes trial-level GLM maps for HCP's WM or MOTOR task."""
     
     if args is None:
         args = get_argparse()
@@ -165,8 +166,6 @@ def compute_trial_level_glms(args: argparse.ArgumentParser=None) -> None:
         )
         out_path = os.path.join(
                     args.trial_level_maps_dir,
-                    f'task-{task}',
-                    'trial_images',
                     f'sub_{subject}'
         )
         os.makedirs(
@@ -292,11 +291,11 @@ def compute_trial_level_glms(args: argparse.ArgumentParser=None) -> None:
                 )
                 
                 if not os.path.isfile(trial_level_contrast_path) or args.overwrite=='True':
-                    trial_level_z_map = trial_level_model.compute_contrast(
+                    trial_level_map = trial_level_model.compute_contrast(
                         contrast,
                         output_type='z_score'
                     )
-                    trial_level_z_map.to_filename(trial_level_contrast_path)
+                    trial_level_map.to_filename(trial_level_contrast_path)
                     plot_contrast_matrix(
                         contrast_def=contrast,
                         design_matrix=design_matrix,
@@ -317,6 +316,7 @@ def get_argparse() -> argparse.Namespace:
     parser.add_argument(
         "--task",
         type=str,
+        metavar='STR',
         required=False,
         default='WM',
         help='task for which to compute trial-level GLM BOLD maps'
@@ -325,18 +325,21 @@ def get_argparse() -> argparse.Namespace:
     parser.add_argument(
         "--source-data-dir",
         type=str,
+        metavar='DIR',
         required=True,
         help='path to HCP source data'
     )
     parser.add_argument(
         "--fmriprep-derivs-dir",
         type=str,
+        metavar='DIR',
         required=True,
         help='path to HCP fmriprep derivatives'
     )
     parser.add_argument(
         "--trial-level-maps-dir",
         type=str,
+        metavar='DIR',
         required=False,
         default='data/task-WM/trial_images',
         help='path where trial-level GLM maps are stored'
@@ -345,6 +348,7 @@ def get_argparse() -> argparse.Namespace:
     parser.add_argument(
         "--overwrite",
         type=str,
+        metavar='BOOL',
         choices=('True', 'False'),
         default='True',
         help='whether or not to overwrite existing trial-level map files'
@@ -356,4 +360,4 @@ def get_argparse() -> argparse.Namespace:
 
 if __name__ == "__main__":
 
-    compute_trial_level_glms()
+    compute_trial_level_BOLD_glm_maps()
