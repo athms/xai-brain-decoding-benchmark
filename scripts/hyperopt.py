@@ -1,5 +1,6 @@
 #!/usr/bin/env python3
 
+import os
 import argparse
 import ray
 import train
@@ -9,7 +10,7 @@ def hyperopt() -> None:
     """Script's main function; runs 3D-CNN hyperoptimization with tune for given task."""
 
     hyperopt_config = vars(get_argparse().parse_args())
-    train_config = vars(get_argparse(train.get_argparse()).parse_args())
+    train_config = vars(train.get_argparse().parse_args())
 
     config = {
         "num_hidden_layers": ray.tune.grid_search([3, 4, 5]),
@@ -40,7 +41,10 @@ def hyperopt() -> None:
             "gpu": hyperopt_config["gpus_per_trial"]
         },
         config=config,
-        local_dir=hyperopt_config["log_dir"],
+        local_dir=os.path.join(
+            hyperopt_config["log_dir"],
+            'ray_results'
+        ),
     )
 
     return None
