@@ -230,7 +230,7 @@ def train_run(
     config,
     images,
     labels,
-    wandb_run: wandb.Run = None,
+    wandb_run = None,
     percentage_validation: float=0.05,
     ) -> Tuple[pd.DataFrame, pd.DataFrame]:
     """
@@ -244,7 +244,7 @@ def train_run(
         Array of images.
     labels : np.ndarray
         Array of labels.
-    wandb_run : wandb.Run
+    wandb_run : wandb run object
         Wandb run object used for logging.
     percentage_validation : float
         Percentage of data to use for validation.
