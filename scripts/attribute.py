@@ -9,7 +9,6 @@ import nibabel as nb
 import nilearn as nl
 import torch
 from captum.attr import \
-    Deconvolution, \
     DeepLift, \
     DeepLiftShap, \
     GuidedBackprop, \
@@ -113,7 +112,6 @@ def attribute(config: Dict=None) -> None:
             'final_model.pt'
         )
         attribution_methods = [
-            Deconvolution,
             DeepLift,
             DeepLiftShap,
             GuidedBackprop,
