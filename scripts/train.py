@@ -13,290 +13,12 @@ sys.path.append('./')
 import src
 
 
-def get_argparse(parser: argparse.ArgumentParser=None) -> argparse.ArgumentParser:
-    
-    if parser is None:
-        parser = argparse.ArgumentParser(
-            description='train CNN for given task'
-        )
-
-    parser.add_argument(
-        '--task',
-        metavar='TASK',
-        default='WM',
-        type=str,
-        help='task for which CNN is trained '
-             '(default: WM)'
-    )
-    parser.add_argument(
-        '--data-dir',
-        metavar='DIR',
-        default='data/task-WM/trial_images',
-        type=str,
-        required=False,
-        help='path where subject images are stored '
-             '(default: data/)'
-    )
-
-
-    parser.add_argument(
-        '--num-hidden-layers',
-        metavar='N',
-        default=4,
-        type=int,
-        required=False,
-        help='number of hidden CNN layers '
-             '(default: 5)'
-    )
-    parser.add_argument(
-        '--num-filters',
-        metavar='N',
-        default=8,
-        type=int,
-        required=False,
-        help='number of CNN kernels per layer '
-             '(default: 8)'
-    )
-    parser.add_argument(
-        '--filter-size',
-        metavar='N',
-        default=3,
-        type=int,
-        required=False,
-        help='size of 3D-CNN filter per channel '
-             '(default: 3)'
-    )
-
-
-    parser.add_argument(
-        '--batch-size',
-        metavar='N',
-        default=32,
-        type=int,
-        required=False,
-        help='number of samples per training step '
-             '(default: 32)'
-    )
-    parser.add_argument(
-        '--num-epochs',
-        metavar='N',
-        default=40,
-        type=int,
-        required=False,
-        help='number of training epochs '
-             '(default: 10)'
-    )
-    parser.add_argument(
-      '--learning-rate',
-      metavar='LR',
-      default=1e-4,
-      type=float,
-      required=False,
-      help='learning rate for AdamW '
-           '(default: 1e-4)'
-    )
-    parser.add_argument(
-      '--dropout',
-      metavar='N',
-      default=0.25,
-      type=float,
-      required=False,
-      help='Dropout rate '
-           '(default: 0.25)'
-    )
-    parser.add_argument(
-      '--num-runs',
-      metavar='N',
-      default=10,
-      type=int,
-      required=False,
-      help='Number of training runs '
-           '(default: 10)'
-    )
-    parser.add_argument(
-      '--num-folds',
-      metavar='N',
-      default=3,
-      type=int,
-      required=False,
-      help='Number of CV-folds '
-           '(default: 3)'
-    )
-    parser.add_argument(
-      '--run',
-      metavar='N',
-      default=-1,
-      type=int,
-      required=False,
-      help='run to compute (overwrites num-runs) '
-           '(default: -1)'
-    )
-    parser.add_argument(
-      '--fold',
-      metavar='N',
-      default=-1,
-      type=int,
-      required=False,
-      help='cv-fold to compute (overwrites num-folds) '
-           '(default: -1)'
-    )
-
-
-    parser.add_argument(
-        '--log-dir',
-        metavar='DIR',
-        default='results/models/',
-        type=str,
-        required=False,
-        help='path where outputs are stored '
-             '(default: results/models/)'
-    )
-    parser.add_argument(
-        '--run-group-name',
-        metavar='NAME',
-        default='none',
-        type=str,
-        required=False,
-        help='group name for runs '
-             '(default: none)'
-    )
-    parser.add_argument(
-        '--report-to',
-        metavar='REPORT_TP',
-        default='none',
-        type=str,
-        choices=('none', 'wandb', 'tune'),
-        help='whether to report training results to wandb, tune or none '
-             '(default: none)'
-    )
-    parser.add_argument(
-        '--wandb-entity',
-        metavar='WANDB_ENTITY',
-        default='athms',
-        type=str,
-        help='wandb entity '
-             '(default: athms)'
-    )
-    parser.add_argument(
-        '--wandb-project',
-        metavar='WANDB_PROJ',
-        default='interpretability-comparison',
-        type=str,
-        help='wandb project '
-             '(default: interpretability-comparison)'
-    )
-    parser.add_argument(
-        '--wandb-mode',
-        metavar='WANDB_MODE',
-        default='online',
-        choices=('online', 'offline', 'disabled'),
-        type=str,
-        help='wandb mode '
-             '(default: online)'
-    )
-    parser.add_argument(
-        '--smoke-test',
-        metavar='TEST',
-        default='False',
-        choices=('True', 'False'),
-        type=str,
-        help='whether to run training as smoke-test '
-             '(default: False)'
-    )
-    parser.add_argument(
-        '--verbose',
-        metavar='VERBOSE',
-        default='True',
-        choices=('True', 'False'),
-        type=str,
-        help='comment training? '
-             '(default: True)'
-    )
-    parser.add_argument(
-        '--seed',
-        metavar='DIR',
-        default=1,
-        type=int,
-        required=False,
-        help='initial random seed '
-             '(default: 1)'
-    )
-    parser.add_argument(
-        '--permute-labels',
-        metavar='BOOL',
-        default='False',
-        choices=('True', 'False'),
-        type=str,
-        required=False,
-        help='whether or not to permute training labels'
-    )
-    parser.add_argument(
-        '--model-config',
-        metavar='CONFIG',
-        default='none',
-        type=str,
-        required=False,
-        help=''
-    )
-
-    return parser
-
-
-def config_cleanup(config):
-    config["verbose"] = config["verbose"] == 'True'
-    config["smoke_test"] = config["smoke_test"] == 'True'
-    config["permute_labels"] = config["permute_labels"] == 'True'
-    config["device"] = "cuda:0" if torch.cuda.is_available() else "cpu"
-    
-    if config["smoke_test"]:
-        config["num_epochs"] = 1
-        config["batch_size"] = 2
-        config["num_runs"] = 1
-        config["num_folds"] = 2
-    
-    if config["fold"] != -1:
-        config["num_folds"] = 1
-
-    if config["run"] != -1:
-        config["num_runs"] = 1
-
-    if config['model_config'] != 'none':
-        print(f'\n! Loading model config from file: {config["model_config"]}...')
-        assert os.path.isfile(config['model_config']), f'{config["model_config"]} not found'
-        loaded_config = json.load(open(config['model_config']))
-        for key in [
-            'num_hidden_layers',
-            'num_filters', 
-            'filter_size',
-            'batch_size',
-            'learning_rate',
-            'dropout'
-        ]:
-            print(f'\tsetting {key} to {loaded_config[key]}')
-            config[key] = loaded_config[key]
-
-    if config["run_group_name"] == 'none':
-        config["run_group_name"] = f'task-{config["task"]}'
-        config["run_group_name"] += f'_l-{config["num_hidden_layers"]}'
-        config["run_group_name"] += f'_f-{config["num_filters"]}'
-        config["run_group_name"] += f'_fs-{config["filter_size"]}'
-        config["run_group_name"] += f'_bs-{config["batch_size"]}'
-        config["run_group_name"] += f'_lr-{str(config["learning_rate"]).replace(".", "")}'
-        config["run_group_name"] += f'_d-{str(config["dropout"]).replace(".", "")}'
-
-    config["log_dir"] = os.path.join(
-        config["log_dir"],
-        config["run_group_name"]
-    )
-
-    return config
-
-
 def train(config: Dict=None) -> None:
+    """Script's main function; trains 3D convolutional neural network."""
 
     if config is None:
         config =  vars(get_argparse().parse_args())
-    config = config_cleanup(dict(config))
+    config = _config_cleanup(dict(config))
     
     assert config["task"] in [
         'heat-rejection',
@@ -364,6 +86,7 @@ def train(config: Dict=None) -> None:
                 config["run_log_dir"],
                 exist_ok=True
             )
+
             if config["report_to"] == 'wandb':
                 src.reset_wandb_env()
                 wandb_run = wandb.init(
@@ -387,6 +110,7 @@ def train(config: Dict=None) -> None:
                 labels=train_labels,
                 wandb_run=wandb_run if config["report_to"] == 'wandb' else None,
             )
+
             if config["report_to"] == 'tune':
                 final_eval_losses.append(run_validation_history['loss'].values[-1])
                 final_eval_accuracies.append(run_validation_history['accuracy'].values[-1])
@@ -434,7 +158,8 @@ def train(config: Dict=None) -> None:
     return None
 
 
-def load_train_data(config):
+def load_train_data(config: Dict):
+    """Loads training data, given config."""
 
     trial_image_paths_split_path = os.path.join(
         config["log_dir"],
@@ -450,7 +175,7 @@ def load_train_data(config):
             ]
         )
         subjects.sort()
-        test_subjects = subjects[::5]
+        test_subjects = subjects[::5] # use every 5th subject for testing
         train_subjects = np.array(
             [
                 s for s in subjects
@@ -505,9 +230,32 @@ def train_run(
     config,
     images,
     labels,
-    wandb_run=None,
+    wandb_run: wandb.Run = None,
     percentage_validation: float=0.05,
     ) -> Tuple[pd.DataFrame, pd.DataFrame]:
+    """
+    Trains 3D convolutional neural network, given config, images, and labels.
+
+    Parameters
+    ----------
+    config : Dict
+        Dictionary of configuration parameters.
+    images : np.ndarray
+        Array of images.
+    labels : np.ndarray
+        Array of labels.
+    wandb_run : wandb.Run
+        Wandb run object used for logging.
+    percentage_validation : float
+        Percentage of data to use for validation.
+
+    Returns
+    -------
+    train_history : pd.DataFrame
+        Training history.
+    validation_history : pd.DataFrame
+        Validation history.
+    """
     config["seed"] = config["seed"] + config["run"] + config["fold"]
     torch.manual_seed(config["seed"])
     np.random.seed(config["seed"])
@@ -681,5 +429,288 @@ def train_run(
     )
 
 
+def get_argparse(parser: argparse.ArgumentParser=None) -> argparse.ArgumentParser:
+    
+    if parser is None:
+        parser = argparse.ArgumentParser(
+            description='train CNN for given task'
+        )
+
+    parser.add_argument(
+        '--task',
+        metavar='TASK',
+        default='WM',
+        type=str,
+        help='task for which 3D-CNN is trained '
+             '(default: WM)'
+    )
+    parser.add_argument(
+        '--data-dir',
+        metavar='DIR',
+        default='data/task-WM/trial_images',
+        type=str,
+        required=False,
+        help='path where trial-level BOLD GLM maps are stored '
+             '(default: data/)'
+    )
+
+
+    parser.add_argument(
+        '--num-hidden-layers',
+        metavar='N',
+        default=4,
+        type=int,
+        required=False,
+        help='number of hidden 3D-CNN layers '
+             '(default: 4)'
+    )
+    parser.add_argument(
+        '--num-filters',
+        metavar='N',
+        default=8,
+        type=int,
+        required=False,
+        help='number of 3D-CNN kernels per layer '
+             '(default: 8)'
+    )
+    parser.add_argument(
+        '--filter-size',
+        metavar='N',
+        default=3,
+        type=int,
+        required=False,
+        help='size of 3D-CNN filter per channel '
+             '(default: 3)'
+    )
+
+
+    parser.add_argument(
+        '--batch-size',
+        metavar='N',
+        default=32,
+        type=int,
+        required=False,
+        help='number of samples per training step '
+             '(default: 32)'
+    )
+    parser.add_argument(
+        '--num-epochs',
+        metavar='N',
+        default=40,
+        type=int,
+        required=False,
+        help='number of training epochs '
+             '(default: 40)'
+    )
+    parser.add_argument(
+      '--learning-rate',
+      metavar='FLOAT',
+      default=1e-4,
+      type=float,
+      required=False,
+      help='learning rate for AdamW '
+           '(default: 1e-4)'
+    )
+    parser.add_argument(
+      '--dropout',
+      metavar='FLOAT',
+      default=0.25,
+      type=float,
+      required=False,
+      help='Dropout rate '
+           '(default: 0.25)'
+    )
+    parser.add_argument(
+      '--num-runs',
+      metavar='N',
+      default=10,
+      type=int,
+      required=False,
+      help='Number of training runs '
+           '(default: 10)'
+    )
+    parser.add_argument(
+      '--num-folds',
+      metavar='N',
+      default=3,
+      type=int,
+      required=False,
+      help='Number of CV-folds per training run'
+           '(default: 3)'
+    )
+    parser.add_argument(
+      '--run',
+      metavar='INT',
+      default=-1,
+      type=int,
+      required=False,
+      help='run to compute (overwrites num-runs) '
+           '(default: -1)'
+    )
+    parser.add_argument(
+      '--fold',
+      metavar='INT',
+      default=-1,
+      type=int,
+      required=False,
+      help='cv-fold to compute (overwrites num-folds) '
+           '(default: -1)'
+    )
+
+
+    parser.add_argument(
+        '--log-dir',
+        metavar='DIR',
+        default='results/models/',
+        type=str,
+        required=False,
+        help='path where models and logs are stored '
+             '(default: results/models/)'
+    )
+    parser.add_argument(
+        '--run-group-name',
+        metavar='STR',
+        default='none',
+        type=str,
+        required=False,
+        help='group name for runs used during logging '
+             '(default: none)'
+    )
+    parser.add_argument(
+        '--report-to',
+        metavar='STR',
+        default='none',
+        type=str,
+        choices=('none', 'wandb', 'tune'),
+        help='whether to report training results to wandb, tune or none '
+             '(default: none)'
+    )
+    parser.add_argument(
+        '--wandb-entity',
+        metavar='STR',
+        type=str,
+        required=True,
+        help='entity used for wandb logging'
+    )
+    parser.add_argument(
+        '--wandb-project',
+        metavar='STR',
+        default='interpreting-brain-decoding-models',
+        type=str,
+        help='project used for wandb logging '
+             '(default: interpreting-brain-decoding-models)'
+    )
+    parser.add_argument(
+        '--wandb-mode',
+        metavar='STR',
+        default='online',
+        choices=('online', 'offline', 'disabled'),
+        type=str,
+        help='mode used for wandb logging '
+             'one of [online, offline, disabled] (default: online)'
+    )
+    parser.add_argument(
+        '--smoke-test',
+        metavar='BOOL',
+        default='False',
+        choices=('True', 'False'),
+        type=str,
+        help='whether to run training in smoke-test mode '
+             'used for testing purposes (default: False)'
+    )
+    parser.add_argument(
+        '--verbose',
+        metavar='BOOL',
+        default='True',
+        choices=('True', 'False'),
+        type=str,
+        help='actively comment training? '
+             '(default: True)'
+    )
+    parser.add_argument(
+        '--seed',
+        metavar='INT',
+        default=1234,
+        type=int,
+        required=False,
+        help='initial random seed '
+             '(default: 1234)'
+    )
+    parser.add_argument(
+        '--permute-labels',
+        metavar='BOOL',
+        default='False',
+        choices=('True', 'False'),
+        type=str,
+        required=False,
+        help='whether or not to permute training labels'
+             '(default: False)'
+    )
+    parser.add_argument(
+        '--model-config',
+        metavar='CONFIG',
+        default='none',
+        type=str,
+        required=False,
+        help='path to model configuration file used to specify model '
+             'if specified, overwrites all other script settings for the model!'
+             '(default: none)'
+    )
+
+    return parser
+
+
+def _config_cleanup(config):
+    """Cleans up config dictionary, as generated by vars(get_argparse().parse_args())"""
+    config["verbose"] = config["verbose"] == 'True'
+    config["smoke_test"] = config["smoke_test"] == 'True'
+    config["permute_labels"] = config["permute_labels"] == 'True'
+    config["device"] = "cuda:0" if torch.cuda.is_available() else "cpu"
+    
+    if config["smoke_test"]:
+        config["num_epochs"] = 1
+        config["batch_size"] = 2
+        config["num_runs"] = 1
+        config["num_folds"] = 2
+    
+    if config["fold"] != -1:
+        config["num_folds"] = 1
+
+    if config["run"] != -1:
+        config["num_runs"] = 1
+
+    if config['model_config'] != 'none':
+        print(f'\n! Loading model config from file: {config["model_config"]}...')
+        assert os.path.isfile(config['model_config']), f'{config["model_config"]} not found'
+        loaded_config = json.load(open(config['model_config']))
+        for key in [
+            'num_hidden_layers',
+            'num_filters', 
+            'filter_size',
+            'batch_size',
+            'learning_rate',
+            'dropout'
+        ]:
+            print(f'\tsetting {key} to {loaded_config[key]}')
+            config[key] = loaded_config[key]
+
+    if config["run_group_name"] == 'none':
+        config["run_group_name"] = f'task-{config["task"]}'
+        config["run_group_name"] += f'_l-{config["num_hidden_layers"]}'
+        config["run_group_name"] += f'_f-{config["num_filters"]}'
+        config["run_group_name"] += f'_fs-{config["filter_size"]}'
+        config["run_group_name"] += f'_bs-{config["batch_size"]}'
+        config["run_group_name"] += f'_lr-{str(config["learning_rate"]).replace(".", "")}'
+        config["run_group_name"] += f'_d-{str(config["dropout"]).replace(".", "")}'
+
+    config["log_dir"] = os.path.join(
+        config["log_dir"],
+        config["run_group_name"]
+    )
+
+    return config
+
+
 if __name__ == '__main__':
+
     train()
