@@ -21,9 +21,17 @@ def compute_subject_level_BOLD_glm_maps(config=None) -> None:
         config = vars(get_argsparse().parse_args())
         config['plot_stat_maps'] = config['plot_stat_maps'] == 'True'
 
+    task = config['task']
+    print(
+        f'\nprocessing task: {task}'
+    )
+
     glm_data = gather_glm_data(config['data_dir'])
     
     for subject in glm_data['subject'].unique():
+        print(
+            f'\tprocessing sub-{subject}'
+        )
         subject_contrasts_path = os.path.join(
             config['subject_level_maps_dir'],
             f'sub_{subject}'
