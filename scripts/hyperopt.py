@@ -8,7 +8,7 @@ from train import train
 def hyperopt() -> None:
     """Script's main function; runs 3D-CNN hyperoptimization with tune for given task."""
 
-    hyperopt_args = vars(get_argsparse().parse_args())
+    hyperopt_config = vars(get_argsparse().parse_args())
 
     config = {
         "num_hidden_layers": ray.tune.grid_search([3, 4, 5]),
@@ -17,24 +17,28 @@ def hyperopt() -> None:
         "batch_size": ray.tune.grid_search([32, 64]),
         "learning_rate": ray.tune.grid_search([1e-4, 1e-3]),
         "dropout": ray.tune.grid_search([0.25, 0.5]),
-        "task": hyperopt_args["task"],
-        "data_dir": hyperopt_args["data_dir"],
+        "task": hyperopt_config["task"],
+        "data_dir": hyperopt_config["data_dir"],
         "num_epochs": 40,
         "num_runs": 1,
         "num_folds": 3,
-        "log_dir": hyperopt_args["log_dir"],
+        "log_dir": hyperopt_config["log_dir"],
         "report_to": "tune",
         "seed": 1234
     }
+    
+    for k, v in hyperopt_config.items():
+        if k not in config:
+            config[k] = v
 
     _ = ray.tune.run(
         train,
         resources_per_trial={
-            "cpu": hyperopt_args["cpus_per_trial"],
-            "gpu": hyperopt_args["gpus_per_trial"]
+            "cpu": hyperopt_config["cpus_per_trial"],
+            "gpu": hyperopt_config["gpus_per_trial"]
         },
         config=config,
-        local_dir=hyperopt_args["log_dir"],
+        local_dir=hyperopt_config["log_dir"],
     )
 
     return None
