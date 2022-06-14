@@ -18,7 +18,7 @@ def train(config: Dict=None) -> None:
 
     if config is None:
         config =  vars(get_argparse().parse_args())
-    config = _config_cleanup(dict(config))
+        config = _config_cleanup(dict(config))
     
     assert config["task"] in [
         'heat-rejection',
