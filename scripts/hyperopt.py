@@ -2,13 +2,14 @@
 
 import argparse
 import ray
-from train import train
+import train
 
 
 def hyperopt() -> None:
     """Script's main function; runs 3D-CNN hyperoptimization with tune for given task."""
 
-    hyperopt_config = vars(get_argsparse().parse_args())
+    hyperopt_config = vars(get_argparse().parse_args())
+    train_config = vars(get_argparse(train.get_argparse()).parse_args())
 
     config = {
         "num_hidden_layers": ray.tune.grid_search([3, 4, 5]),
@@ -26,13 +27,14 @@ def hyperopt() -> None:
         "report_to": "tune",
         "seed": 1234
     }
-    
-    for k, v in hyperopt_config.items():
+
+    for k, v in train_config.items():
+        
         if k not in config:
             config[k] = v
 
     _ = ray.tune.run(
-        train,
+        train.train,
         resources_per_trial={
             "cpu": hyperopt_config["cpus_per_trial"],
             "gpu": hyperopt_config["gpus_per_trial"]
@@ -44,7 +46,7 @@ def hyperopt() -> None:
     return None
 
 
-def get_argsparse(parser: argparse.ArgumentParser=None) -> argparse.ArgumentParser:
+def get_argparse(parser: argparse.ArgumentParser=None) -> argparse.ArgumentParser:
     
     if parser is None:
         parser = argparse.ArgumentParser(
