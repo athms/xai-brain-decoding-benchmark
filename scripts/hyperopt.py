@@ -10,7 +10,7 @@ def hyperopt() -> None:
     """Script's main function; runs 3D-CNN hyperoptimization with tune for given task."""
 
     hyperopt_config = vars(get_argparse().parse_args())
-    train_config = vars(train.get_argparse().parse_args())
+    train_config = train.get_config()
 
     config = {
         "num_hidden_layers": ray.tune.grid_search([3, 4, 5]),
