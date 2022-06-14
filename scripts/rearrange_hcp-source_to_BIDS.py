@@ -15,7 +15,7 @@ def rearrange_hcp_to_bids(args: argparse.ArgumentParser=None) -> None:
     if args is None:
         args = get_argparse().parse_args()
 
-    subjects = np.unique(os.listdir(args.source))
+    subjects = np.unique(os.listdir(args.source_dir))
     tasks = [
         'EMOTION',
         'GAMBLING',
@@ -34,7 +34,7 @@ def rearrange_hcp_to_bids(args: argparse.ArgumentParser=None) -> None:
 
     for subject in subjects:
         sub_source_dir = os.path.join(
-            args.source,
+            args.source_dir,
             subject,
             'unprocessed',
             '3T'
@@ -46,7 +46,7 @@ def rearrange_hcp_to_bids(args: argparse.ArgumentParser=None) -> None:
             '{}_3T_T1w_MPR1.nii.gz'.format(subject)
         )
         target_path = os.path.join(
-            args.target,
+            args.target_dir,
             'sub-{}'.format(subject),
             'anat'
         )
@@ -94,7 +94,7 @@ def rearrange_hcp_to_bids(args: argparse.ArgumentParser=None) -> None:
                     )
 
                 target_path = os.path.join(
-                    args.target,
+                    args.target_dir,
                     f'sub-{subject}',
                     'func'
                 )
@@ -132,7 +132,7 @@ def rearrange_hcp_to_bids(args: argparse.ArgumentParser=None) -> None:
                     continue
                 
                 tar_path = os.path.join(
-                    args.source,
+                    args.source_dir,
                     subject,
                     'MNINonLinear',
                     'Results',
@@ -155,7 +155,7 @@ def rearrange_hcp_to_bids(args: argparse.ArgumentParser=None) -> None:
                                 continue
 
                             target_path = os.path.join(
-                                args.target,
+                                args.target_dir,
                                 f'sub-{subject}',
                                 'func',
                                 f'sub-{subject}_task-{task}_run-{run_i}_EV_{f}'
@@ -191,7 +191,7 @@ def rearrange_hcp_to_bids(args: argparse.ArgumentParser=None) -> None:
                                 )
                     
                     target_path = os.path.join(
-                        args.target,
+                        args.target_dir,
                         f'sub-{subject}',
                         'func',
                         f'sub-{subject}_task-{task}_run-{run_i}_EV.csv'
@@ -203,7 +203,7 @@ def rearrange_hcp_to_bids(args: argparse.ArgumentParser=None) -> None:
                         )
                         ev_filepaths = [
                             os.path.join(
-                                args.target,
+                                args.target_dir,
                                 f'sub-{subject}',
                                 'func',
                                 f'sub-{subject}_task-{task}_run-{run_i}_EV_{f}'
@@ -457,13 +457,13 @@ def ev_file_names_for_task(
 def get_argparse() -> argparse.ArgumentParser:
     parser = argparse.ArgumentParser(description='hcp to BIDS')
     parser.add_argument(
-        '--source',
+        '--source-dir',
         metavar='DIR',
         type=str,
         help='path to HCP source directory'
     )
     parser.add_argument(
-        '--target',
+        '--target-dir',
         metavar='DIR',
         type=str,
         help='path where HCP data will be stored in BIDS format'
