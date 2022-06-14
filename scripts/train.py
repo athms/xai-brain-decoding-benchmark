@@ -16,8 +16,7 @@ import src
 def train(config: Dict=None) -> None:
     """Script's main function; trains 3D convolutional neural network."""
 
-    if config is None:
-        config = get_config()
+    config = make_config(config=config)
     
     assert config["task"] in [
         'heat-rejection',
@@ -669,9 +668,12 @@ def get_argparse(parser: argparse.ArgumentParser=None) -> argparse.ArgumentParse
     return parser
 
 
-def get_config():
+def make_config(config: Dict=None):
     """Generates config dictionary"""
-    config = vars(get_argparse().parse_args())
+    
+    if config is None:
+        config = vars(get_argparse().parse_args())
+    
     config["verbose"] = config["verbose"] == 'True'
     config["permute_labels"] = config["permute_labels"] == 'True'
     config["device"] = "cuda:0" if torch.cuda.is_available() else "cpu"

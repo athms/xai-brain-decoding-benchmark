@@ -10,7 +10,7 @@ def hyperopt() -> None:
     """Script's main function; runs 3D-CNN hyperoptimization with tune for given task."""
 
     hyperopt_config = vars(get_argparse().parse_args())
-    train_config = train.get_config()
+    train_config = train.make_config()
 
     config = {
         "num_hidden_layers": ray.tune.grid_search([3, 4, 5]),
@@ -82,7 +82,7 @@ def get_argparse(parser: argparse.ArgumentParser=None) -> argparse.ArgumentParse
     parser.add_argument(
         '--cpus-per-trial',
         metavar='N',
-        default=2,
+        default=4,
         type=int,
         help='number of CPUs per hyperopt trial'
     )
