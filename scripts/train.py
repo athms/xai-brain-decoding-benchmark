@@ -656,7 +656,7 @@ def get_argparse(parser: argparse.ArgumentParser=None) -> argparse.ArgumentParse
     )
     parser.add_argument(
         '--model-config',
-        metavar='CONFIG',
+        metavar='PATH',
         default='none',
         type=str,
         required=False,
@@ -701,7 +701,8 @@ def make_config(config: Dict=None):
             'filter_size',
             'batch_size',
             'learning_rate',
-            'dropout'
+            'dropout',
+            'num_epochs'
         ]:
             print(f'\tsetting {key} to {loaded_config[key]}')
             config[key] = loaded_config[key]
