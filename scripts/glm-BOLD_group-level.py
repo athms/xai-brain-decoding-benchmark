@@ -19,7 +19,7 @@ def compute_group_level_BOLD_glm_maps(config=None) -> None:
     """Script's main function; computes group-level BOLD GLM maps."""
     
     if config is None:
-        config = vars(get_argsparse().parse_args())
+        config = vars(get_argparse().parse_args())
 
     glm_data = gather_glm_data(config['subject_level_maps_dir'])
     glm_data = glm_data[glm_data['label'].isin(target_labeling[config['task']])].copy()
@@ -171,7 +171,7 @@ def make_group_level_design_matrix(group_data) -> pd.DataFrame:
     return pd.DataFrame(design_matrix)
 
 
-def get_argsparse() -> argparse.ArgumentParser:
+def get_argparse() -> argparse.ArgumentParser:
     parser = argparse.ArgumentParser(
         description='compute group-level BOLD GLM maps'
     )

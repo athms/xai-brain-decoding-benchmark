@@ -20,7 +20,7 @@ def compute_subject_level_attribution_glm_maps(config=None) -> None:
     """
     
     if config is None:
-        config = vars(get_argsparse().parse_args())
+        config = vars(get_argparse().parse_args())
         config['plot_stat_maps'] = config['plot_stat_maps'] == 'True'
 
     attribution_methods = [
@@ -245,7 +245,7 @@ def make_subject_level_design_matrix(subject_data) -> pd.DataFrame:
     return pd.DataFrame(design_matrix)
 
 
-def get_argsparse() -> argparse.ArgumentParser:
+def get_argparse() -> argparse.ArgumentParser:
     parser = argparse.ArgumentParser(
         description='compute subject-level attribution GLM maps'
     )

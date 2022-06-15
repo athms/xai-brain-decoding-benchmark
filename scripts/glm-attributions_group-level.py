@@ -19,7 +19,7 @@ def compute_group_level_attribution_glm_maps(config=None) -> None:
     for attribution data."""
     
     if config is None:
-        config = vars(get_argsparse().parse_args())
+        config = vars(get_argparse().parse_args())
 
     attribution_methods = {
         p for p in os.listdir(config['subject_level_maps_dir'])
@@ -190,7 +190,7 @@ def make_group_level_design_matrix(group_data) -> pd.DataFrame:
     return pd.DataFrame(design_matrix)
 
 
-def get_argsparse() -> argparse.ArgumentParser:
+def get_argparse() -> argparse.ArgumentParser:
     parser = argparse.ArgumentParser(
         description='compute group-level attribution GLM maps.'
     )

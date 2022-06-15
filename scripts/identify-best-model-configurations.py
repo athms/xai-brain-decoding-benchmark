@@ -13,7 +13,7 @@ def identify_best_model_configuration(config=None) -> None:
     configuration for given task from hyperopt results."""
     
     if config is None:
-        config =  vars(get_argsparse().parse_args())
+        config =  vars(get_argparse().parse_args())
 
     model_dirs = [
         os.path.join(config['hyperopt_dir'], d)
@@ -110,7 +110,7 @@ def identify_best_model_configuration(config=None) -> None:
     return None
 
 
-def get_argsparse(parser: argparse.ArgumentParser=None) -> argparse.ArgumentParser:
+def get_argparse(parser: argparse.ArgumentParser=None) -> argparse.ArgumentParser:
     
     if parser is None:
         parser = argparse.ArgumentParser(
