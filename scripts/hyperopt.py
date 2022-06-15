@@ -25,9 +25,9 @@ def hyperopt() -> None:
         "num_epochs": 40,
         "num_runs": 1,
         "num_folds": 3,
-        "log_dir": hyperopt_config["log_dir"],
+        "log_dir": hyperopt_config["hyperopt_dir"],
         "report_to": "tune",
-        "seed": 1234
+        "seed": hyperopt_config["seed"]
     }
 
     for k, v in train_config.items():
@@ -72,27 +72,37 @@ def get_argparse(parser: argparse.ArgumentParser=None) -> argparse.ArgumentParse
         default='data/task-WM/trial_images',
         type=str,
         help='path to trial-level BOLD GLM maps'
+             '(default: data/task-WM/trial_images)'
     )
     parser.add_argument(
-        '--log-dir',
+        '--hyperopt-dir',
         metavar='DIR',
         default='results/hyperopt/task-WM',
         type=str,
-        help='path where models and logs are stored'
+        help='path where hyperopt results are stored'
+             '(default: results/hyperopt/task-WM)'
     )
     parser.add_argument(
         '--cpus-per-trial',
         metavar='N',
         default=4,
         type=int,
-        help='number of CPUs per hyperopt trial'
+        help='number of CPUs per hyperopt trial (default: 4)'
     )
     parser.add_argument(
         '--gpus-per-trial',
         metavar='N',
         default=1,
         type=float,
-        help='number of GPUs per hyperopt trial'
+        help='number of GPUs per hyperopt trial (default: 1)'
+    )
+    parser.add_argument(
+        '--seed',
+        metavar='INT',
+        default=1234,
+        type=int,
+        required=False,
+        help='initial random seed (default: 1234)'
     )
 
     return parser
