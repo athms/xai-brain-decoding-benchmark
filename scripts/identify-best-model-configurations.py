@@ -9,6 +9,8 @@ import pandas as pd
 
 
 def identify_best_model_configuration(config=None) -> None:
+    """Script's main function; identifies best-performing model 
+    configuration for given task from hyperopt results."""
     
     if config is None:
         config =  vars(get_argsparse().parse_args())
@@ -112,7 +114,7 @@ def get_argsparse(parser: argparse.ArgumentParser=None) -> argparse.ArgumentPars
     
     if parser is None:
         parser = argparse.ArgumentParser(
-            description='identify best-performing model configurations for given task',
+            description='identify best-performing model configuration for given task',
         )
 
     parser.add_argument(
