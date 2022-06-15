@@ -28,11 +28,15 @@ from src import target_labeling
 
 
 def attribute(config: Dict=None) -> None:
+    """Script's main function; interprets model decoding decisions
+    for given task with studied interpretation methods."""
     
     if config is None:
         config = vars(attribute_argsparse().parse_args())
-    
-    config['use_random_init'] = config['use_random_init'] == 'True'
+        config['use_random_init'] = config['use_random_init'] == 'True'
+
+    np.random.seed(config["seed"])
+    torch.manual_seed(config["seed"])
 
     assert config['task'] in config['fitted_model_dir'], \
         f'model in {config["fitted_model_dir"]} does not match specified task {config["task"]}'
@@ -57,9 +61,17 @@ def attribute(config: Dict=None) -> None:
     Gradient = Saliency
     Gradient.__name__ = 'Gradient'
 
-    # setup SmoothGrad attributoin
-    SmoothGrad = NoiseTunnel
-    SmoothGrad.__name__ = 'SmoothGrad'
+    # setup dummy-class for SmoothGrad attribution
+    class SmoothGradDummy:
+        
+        def __init__(self):
+            self.__name__ = 'SmoothGrad'
+        
+        def __call__(self, model):
+            return NoiseTunnel(Saliency(model))
+    
+    SmoothGrad = SmoothGradDummy()
+        
 
     with open(
         os.path.join(
@@ -68,7 +80,7 @@ def attribute(config: Dict=None) -> None:
             ),
         'r'
         ) as f:
-        train_trial_image_paths = json.load(f)
+        trial_image_paths = json.load(f)
 
     fitting_runs = np.sort(
         a=[
@@ -81,7 +93,7 @@ def attribute(config: Dict=None) -> None:
     if config['use_random_init']:
         fitting_runs = fitting_runs[0]
 
-    test_subjects = list(train_trial_image_paths['test'].keys())
+    test_subjects = list(trial_image_paths['test'].keys())
     test_image_paths =  get_subject_trial_image_paths(
         path=config["data_dir"],
         subjects=test_subjects,
@@ -99,8 +111,6 @@ def attribute(config: Dict=None) -> None:
     )
     input_shape = test_images.shape[1:]
     num_labels = len(target_labeling[config["task"]])
-    np.random.seed(config["seed"])
-    torch.manual_seed(config["seed"])
 
     for run in fitting_runs:
         print(
@@ -126,9 +136,8 @@ def attribute(config: Dict=None) -> None:
         for attribution_method in attribution_methods:
             name_attribution_method = str(attribution_method.__name__)
             print(
-                f'... {name_attribution_method} attributions'
+                f'\t... {name_attribution_method} attributions'
             )
-
             model = CNNModel(
                 input_shape=input_shape,
                 num_classes=num_labels,
@@ -137,18 +146,20 @@ def attribute(config: Dict=None) -> None:
                 num_hidden_layers=model_config["num_hidden_layers"],
                 dropout=model_config["dropout"]
             )
-            
+
             if config['use_random_init']:
-                
                 print(
                     '/!\ Using random weight initializations for attribution'
                 )
-            
+
             else:
 
                 if not torch.cuda.is_available():
                     model.load_state_dict(
-                        torch.load(model_path, map_location=torch.device('cpu'))
+                        torch.load(
+                            model_path,
+                            map_location=torch.device('cpu')
+                        )
                     )
 
                 else:
@@ -199,9 +210,11 @@ def attribute(config: Dict=None) -> None:
             print(
                 '\tDone!'
             )
+
         print(
             'Done!'
         )
+
 
 def attribute_w_method(
     model,
@@ -301,7 +314,7 @@ def attribute_w_method(
         )
 
     elif name_attribution_method == 'SmoothGrad':
-        attributer = attribution_method(Saliency(model))
+        attributer = attribution_method(model)
         attribution = attributer.attribute(
             inputs=image,
             nt_type='smoothgrad',
@@ -327,19 +340,24 @@ def attribute_argsparse() -> argparse.ArgumentParser:
         description='attribute model decoding decisions in given task'
     )
     parser.add_argument(
-        '--fitted-model-dir',
-        metavar='DIR',
-        type=str,
-        required=True,
-        help='path where trained model is stored'
-    )
-    parser.add_argument(
         '--task',
         metavar='DIR',
         default='WM',
         type=str,
         required=False,
         help='task for which data is interpreted (default: WM)'
+    )
+    parser.add_argument(
+        '--fitted-model-dir',
+        metavar='DIR',
+        type=str,
+        required=True,
+        help='path where fitting runs for model that '
+             'is to be interpreted are stored.'
+             '(as resulting from running scripts/train.py)'
+             'If multiple fitting runs exist for the model, '
+             'the decoding decisions of the final model of each run'
+             'are interpreted for the test data of the given task'
     )
     parser.add_argument(
         '--data-dir',
@@ -369,10 +387,10 @@ def attribute_argsparse() -> argparse.ArgumentParser:
     parser.add_argument(
         '--seed',
         metavar='INT',
-        default=1,
+        default=1234,
         type=int,
         required=False,
-        help='random seed (default: 1)'
+        help='random seed (default: 1234)'
     )
     return parser
 
