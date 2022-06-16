@@ -143,9 +143,6 @@ def fig_brain_maps_similarity(config=None) -> None:
             else:
                 ax.set_xticklabels([])
         
-    print(
-        f'\nSaving figure to {config["figures_dir"]}'
-    )
     for label in list('ABCDEF'):
         fig_axs[label].text(
             -0.05,
