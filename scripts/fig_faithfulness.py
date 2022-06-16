@@ -16,19 +16,10 @@ sns.set_theme(
 
 def fig_faithfulness(config=None) -> None:
     """Script's main function; creates overview
-    figure for faithfulness analysis."""
+    figure for faithfulness analysis (scripts/faithfulness_analysis.py)."""
 
     if config is None:
         config = vars(get_argparse().parse_args())
-
-    # fractions = [
-    #     np.arange(0, 2, 0.2),
-    #     np.arange(2, 5, 0.5),
-    #     np.arange(5, 10, 1),
-    #     np.arange(10, 32, 2)
-    # ]
-    # fractions = np.concatenate(fractions)
-    # fractions = np.round(fractions, 1)
 
     fig, fig_axs = plt.subplot_mosaic(
         """

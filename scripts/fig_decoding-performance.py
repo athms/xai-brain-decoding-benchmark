@@ -31,6 +31,11 @@ def fig_decoding_performance(config: Dict=None) -> None:
     if config is None:
         config =  vars(get_argparse().parse_args())
 
+    os.makedirs(
+        config["figures_dir"],
+        exist_ok=True
+    )
+
     device = torch.device("cuda:0" if torch.cuda.is_available() else "cpu")
 
     fig, fig_axs = plt.subplot_mosaic(
@@ -324,7 +329,6 @@ def fig_decoding_performance(config: Dict=None) -> None:
             va='top'
         )
 
-    os.makedirs(config['figures_dir'], exist_ok=True)
     fig.tight_layout()
     fig.savefig(
         os.path.join(
