@@ -69,10 +69,10 @@ def get_argparse(parser: argparse.ArgumentParser=None) -> argparse.ArgumentParse
     parser.add_argument(
         '--data-dir',
         metavar='DIR',
-        default='data/task-WM/trial_images',
+        default='data/task-WM',
         type=str,
         help='path to trial-level BOLD GLM maps'
-             '(default: data/task-WM/trial_images)'
+             '(default: data/task-WM)'
     )
     parser.add_argument(
         '--hyperopt-dir',

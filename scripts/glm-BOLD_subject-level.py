@@ -216,11 +216,11 @@ def get_argparse() -> argparse.ArgumentParser:
     parser.add_argument(
         '--data-dir',
         metavar='DIR',
-        default='data/task-WM/trial_images/',
+        default='data/task-WM',
         type=str,
         required=False,
         help='path where trial-level BOLD GLM maps are stored'
-             '(default: data/task-WM/trial_images/)'
+             '(default: data/task-WM)'
     )
     parser.add_argument(
         '--subject-level-maps-dir',

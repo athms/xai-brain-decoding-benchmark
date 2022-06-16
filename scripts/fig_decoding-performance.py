@@ -92,7 +92,7 @@ def fig_decoding_performance(config: Dict=None) -> None:
         )
         test_subjects = list(trial_image_paths['test'].keys())
         test_image_paths = get_subject_trial_image_paths(
-            path=os.path.join(config["data_dir"], f'task-{task}', 'trial_images'),
+            path=os.path.join(config["data_base_dir"], f'task-{task}'),
             subjects=test_subjects,
             decoding_targets=target_labeling[task].keys()
         )
@@ -355,11 +355,12 @@ def get_argparse(parser: argparse.ArgumentParser=None) -> argparse.ArgumentParse
              'for each task (default: results/models/)'
     )
     parser.add_argument(
-        '--data-dir',
+        '--data-base-dir',
         metavar='DIR',
         type=str,
         default='data/',
-        help='path to trial-level GLM maps (default: data/)'
+        help='path to base directory where trial-level GLM maps are stored '
+             'for all tasks (default: data/)'
     )
     parser.add_argument(
         '--figures-dir',

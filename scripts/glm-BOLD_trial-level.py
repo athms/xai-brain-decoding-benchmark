@@ -343,9 +343,9 @@ def get_argparse() -> argparse.Namespace:
         type=str,
         metavar='DIR',
         required=False,
-        default='data/task-WM/trial_images',
+        default='data/task-WM',
         help='path where trial-level GLM maps are stored'
-             '(default: data/task-WM/trial_images)'
+             '(default: data/task-WM)'
     )
     parser.add_argument(
         "--overwrite",

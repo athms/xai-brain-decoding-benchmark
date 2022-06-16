@@ -363,9 +363,10 @@ def attribute_argsparse() -> argparse.ArgumentParser:
         '--data-dir',
         metavar='DIR',
         type=str,
-        default='data/task-WM/trial_images',
+        default='data/task-WM',
         required=True,
         help='path where subject trial-images are stored'
+             '(default: data/task-WM)'
     )
     parser.add_argument(
         '--attributions-dir',
