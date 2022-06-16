@@ -377,7 +377,7 @@ def get_argparse() -> argparse.ArgumentParser:
         type=str,
         required=False,
         help='directory where trial-level GLM maps are stored '
-             '(default: data/)'
+             '(default: data/task-WM/trial_images)'
     )
     parser.add_argument(
         '--attributions-dir',
