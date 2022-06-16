@@ -71,7 +71,6 @@ results/models figures/: scripts/train.py
 	poetry run python3 scripts/fig_decoding-performance.py \
 		--fitted-models-base-dir results/models
 
-
 # GLM for BOLD data
 results/glm/BOLD: scripts/glm-BOLD_subject-level.py scripts/glm-BOLD_group-level.py
 	# heat-rejection
