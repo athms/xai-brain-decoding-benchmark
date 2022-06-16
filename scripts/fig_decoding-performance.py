@@ -347,7 +347,7 @@ def get_argparse(parser: argparse.ArgumentParser=None) -> argparse.ArgumentParse
         metavar='DIR',
         type=str,
         default='results/models/',
-        help='directory where final fitted model runs are stored '
+        help='directory where final model fitting runs are stored '
              'for each task (default: results/models/)'
     )
     parser.add_argument(
