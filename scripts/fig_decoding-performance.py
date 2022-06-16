@@ -66,8 +66,8 @@ def fig_decoding_performance(config: Dict=None) -> None:
         _ = [sns.despine(ax=ax) for ax in axs]
 
         model_dir = [
-            os.path.join(config['fitted_models_dir'], p)
-            for p in os.listdir(config['fitted_models_dir'])
+            os.path.join(config['fitted_models_base_dir'], p)
+            for p in os.listdir(config['fitted_models_base_dir'])
             if p.startswith(f"task-{task}")
         ]
         assert len(model_dir) == 1, f"too many models ({len(model_dir)}) found for task {task}"
@@ -347,18 +347,18 @@ def get_argparse(parser: argparse.ArgumentParser=None) -> argparse.ArgumentParse
         )
 
     parser.add_argument(
-        '--fitted-models-dir',
+        '--fitted-models-base-dir',
         metavar='DIR',
         type=str,
-        default='results/models/',
+        default='results/models',
         help='directory where final model fitting runs are stored '
-             'for each task (default: results/models/)'
+             'for each task (default: results/models)'
     )
     parser.add_argument(
         '--data-base-dir',
         metavar='DIR',
         type=str,
-        default='data/',
+        default='data',
         help='path to base directory where trial-level GLM maps are stored '
              'for all tasks (default: data/)'
     )

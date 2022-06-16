@@ -651,7 +651,8 @@ def get_argparse(parser: argparse.ArgumentParser=None) -> argparse.ArgumentParse
         choices=('True', 'False'),
         type=str,
         required=False,
-        help='whether or not to permute training labels'
+        help='whether or not to permute training labels '
+             'if permuted, attributions only computed for one fitting run '
              '(default: False)'
     )
     parser.add_argument(
