@@ -27,7 +27,7 @@ from src.model import CNNModel
 from src import target_labeling
 
 
-def attribute(config: Dict=None) -> None:
+def interpret(config: Dict=None) -> None:
     """Script's main function; interprets model decoding decisions
     for given task with studied interpretation methods."""
     
@@ -72,7 +72,6 @@ def attribute(config: Dict=None) -> None:
     
     SmoothGrad = SmoothGradDummy()
         
-
     with open(
         os.path.join(
             config["fitted_model_dir"],
@@ -187,7 +186,7 @@ def attribute(config: Dict=None) -> None:
                         a=image,
                         axis=1
                     )
-                    attribution = attribute_w_method(
+                    attribution = interpret_w_method(
                         model=model,
                         attribution_method=attribution_method,
                         image=image,
@@ -216,7 +215,7 @@ def attribute(config: Dict=None) -> None:
         )
 
 
-def attribute_w_method(
+def interpret_w_method(
     model,
     attribution_method,
     image,
@@ -397,4 +396,4 @@ def attribute_argsparse() -> argparse.ArgumentParser:
 
 if __name__ == '__main__':
     
-    attribute()
+    interpret()
