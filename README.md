@@ -10,7 +10,7 @@ Thomas, A. W., Ré, C., & Poldrack, R. A. (2022). Comparing interpretation metho
 
 ## Project organization
 
-Find below an overview of the repository organization. Note that the results directory is not included in this repostiory due to storage capacity limits and therefore only outlined in the description below.
+Find below an overview of the repository organization. Note that the results directory is not included in this repostiory due to storage capacity limits; We solely outline its structure below.
 
 ```bash
 ├── Makefile           <- Makefile with the following targets ('all' runs all commands in sequence):
