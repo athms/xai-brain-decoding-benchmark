@@ -26,6 +26,7 @@ Find below an overview of the repository organization. Note that the results dir
 ├── pyproject.toml     <- Specifics for installed dependencies
 ├── README.md          <- This README file
 ├── .gitignore         <- Specifies files that Git should ignore
+|
 ├── data/
 |    ├──task-heat-rejection   <- Trial-level GLM BOLD maps for heat-rejection dataset
 |    ├──task-WM               <- Trial-level GLM BOLD maps for WM dataset
