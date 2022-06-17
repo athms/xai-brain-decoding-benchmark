@@ -10,6 +10,8 @@ Thomas, A. W., Ré, C., & Poldrack, R. A. (2022). Comparing interpretation metho
 
 ## Project organization
 
+Find below an overview of the repository organization. Note that we online outline the structure of the results folder as we did not include the results in the repository due to given storage capacity limits. 
+
 ```bash
 ├── Makefile           <- Makefile with the following targets ('all' runs all commands in sequence):
 |                        - 'hyperopt': runs 3D-CNN hyper-parameter optimization for each dataset  
