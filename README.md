@@ -10,7 +10,7 @@ Thomas, A. W., Ré, C., & Poldrack, R. A. (2022). Comparing interpretation metho
 
 ## Project organization
 
-Find below an overview of the repository organization. Note that we online outline the structure of the results folder as we did not include the results in the repository due to given storage capacity limits. 
+Find below an overview of the repository organization. Note that the results directory is not included in this repostiory due to storage capacity limits and therefore only outlined in the description below.
 
 ```bash
 ├── Makefile           <- Makefile with the following targets ('all' runs all commands in sequence):
@@ -31,7 +31,7 @@ Find below an overview of the repository organization. Note that we online outli
 |    ├──task-WM               <- Trial-level GLM BOLD maps for WM dataset
 |    └──task-MOTOR            <- Trial-level GLM BOLD maps for MOTOR dataset
 |
-├── figures/           <- Figures of manuscript
+├── figures/           <- Figures 1, 2-5 of the manuscript. Figure 2 is created manually by the use of the brain maps resulting from the group-level GLM analysis scripts (ie., glm-BOLD_group-level.py and glm-attributions_group-level.py)
 |
 ├── src/
 |    ├── __init__.py          <- Initializes 'src' module
