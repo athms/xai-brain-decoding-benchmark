@@ -1,13 +1,13 @@
-all: hyperopt train glm_bold attribute glm_attributions similarity faithfulness sanity_checks
+all: hyperopt train glm_bold interpret glm_attributions similarity faithfulness sanity_checks
 
 hyperopt: results/hyperopt
-train: results/models figures/
+train: results/models 
 glm_bold: results/glm/BOLD
-attribute: results/attributions
+interpret: results/attributions
 glm_attributions: results/glm/attributions
-similarity: results/brain_map_similarity figures/
-faithfulness: results/faithfulness figures/
-sanity_checks: results/sanity_checks figures/
+similarity: results/brain_map_similarity 
+faithfulness: results/faithfulness 
+sanity_checks: results/sanity_checks 
 
 # HYPEROPT 3D-CNN model configurations
 results/hyperopt: scripts/hyperopt.py scripts/identify-best-model-configuration.py
@@ -39,7 +39,7 @@ results/hyperopt: scripts/hyperopt.py scripts/identify-best-model-configuration.
 		--hyperopt-dir results/hyperopt/task-MOTOR
 
 # TRAIN best-performing model configurations
-results/models figures/: scripts/train.py
+results/models: scripts/train.py
 	# heat-rejection
 	poetry run python3 scripts/train.py \
 		--task heat-rejection \
@@ -68,8 +68,7 @@ results/models figures/: scripts/train.py
 		--run-group-name task-MOTOR_final-model-fits
 
 	# Figure
-	poetry run python3 scripts/fig_decoding-performance.py \
-		--fitted-models-base-dir results/models
+	poetry run python3 scripts/fig_decoding-performance.py
 
 # GLM for BOLD data
 results/glm/BOLD: scripts/glm-BOLD_subject-level.py scripts/glm-BOLD_group-level.py
@@ -104,23 +103,23 @@ results/glm/BOLD: scripts/glm-BOLD_subject-level.py scripts/glm-BOLD_group-level
 		--group-level-maps-dir results/glm/BOLD/task-MOTOR/group_level
 
 # ATTRIBUTE model decoding decisions for test data
-results/attributions: scripts/attribute.py
+results/attributions: scripts/interpret.py
 	# heat-rejection
-	poetry run python3 scripts/attribute.py \
+	poetry run python3 scripts/interpret.py \
 		--task heat-rejection \
 		--fitted-model-dir results/models/task-heat-rejection_final-model-fits \
 		--data-dir data/task-heat-rejection \
 		--attributions-dir results/attributions/task-heat-rejection
 
 	# WM
-	poetry run python3 scripts/attribute.py \
+	poetry run python3 scripts/interpret.py \
 		--task WM \
 		--fitted-model-dir results/models/task-WM_final-model-fits \
 		--data-dir data/task-WM \
 		--attributions-dir results/attributions/task-WM
 
 	# MOTOR
-	poetry run python3 scripts/attribute.py \
+	poetry run python3 scripts/interpret.py \
 		--task MOTOR \
 		--fitted-model-dir results/models/task-MOTOR_final-model-fits \
 		--data-dir data/task-MOTOR \
@@ -159,7 +158,7 @@ results/glm/attributions: scripts/glm-attributions_subject-level.py scripts/glm-
 		--group-level-maps-dir results/glm/attributions/task-MOTOR/group_level
 
 # SIMILARITY of BOLD GLM maps and attribution GLM maps
-results/brain_map_similarity figures/: scripts/brain-map-similarities.py scripts/fig_brain-map-similarities.py
+results/brain_map_similarity: scripts/brain-map-similarities.py scripts/fig_brain-map-similarities.py
 	# heat-rejection
 	poetry run python3 scripts/brain_map_similarities.py \
 		--task heat-rejection \
@@ -189,7 +188,7 @@ results/brain_map_similarity figures/: scripts/brain-map-similarities.py scripts
 		--brain-maps-similarity-base-dir results/brain_map_similarity
 
 # FAITHFULNESS of attributions
-results/faithfulness figures/: scripts/faithfulness.py scripts/fig_faithfulness.py
+results/faithfulness: scripts/faithfulness.py scripts/fig_faithfulness.py
 	# heat-rejection
 	poetry run python3 scripts/faithfulness.py \
 		--task heat-rejection \
@@ -219,7 +218,7 @@ results/faithfulness figures/: scripts/faithfulness.py scripts/fig_faithfulness.
 		--faithfulness-base-dir results/faithfulness
 
 # SANITY_CHECKS for attributions
-results/sanity_checks figures/: scripts/sanity_checks.py scripts/fig_sanity_checks.py
+results/sanity_checks: scripts/sanity_checks.py scripts/fig_sanity_checks.py
 	# heat-rejection
 	# data randomization:
 	poetry run python3 scripts/train.py \
@@ -232,13 +231,13 @@ results/sanity_checks figures/: scripts/sanity_checks.py scripts/fig_sanity_chec
 		--log-dir results/models/randomized_labels \
 		--run-group-name task-heat-rejection_randomized-labels-fit \
 		--permute-labels True
-	poetry run python3 scripts/attribute.py
+	poetry run python3 scripts/interpret.py
 		--task heat-rejection \
 		--fitted-model-dir results/models/randomized_labels/task-heat-rejection_randomized-labels-fit \
 		--data-dir data/task-heat-rejection \
 		--attributions-dir results/attributions/randomized_labels/task-heat-rejection
 	# model randomization:
-	poetry run python3 scripts/attribute.py
+	poetry run python3 scripts/interpret.py
 		--task heat-rejection \
 		--fitted-model-dir results/models/task-heat-rejection_final-model-fits \
 		--data-dir data/task-heat-rejection \
@@ -264,13 +263,13 @@ results/sanity_checks figures/: scripts/sanity_checks.py scripts/fig_sanity_chec
 		--log-dir results/models/randomized_labels \
 		--run-group-name task-WM_randomized-labels-fit \
 		--permute-labels True
-	poetry run python3 scripts/attribute.py
+	poetry run python3 scripts/interpret.py
 		--task WM \
 		--fitted-model-dir results/models/randomized_labels/task-WM_randomized-labels-fit \
 		--data-dir data/task-WM \
 		--attributions-dir results/attributions/randomized_labels/task-WM
 	# model randomization:
-	poetry run python3 scripts/attribute.py
+	poetry run python3 scripts/interpret.py
 		--task WM \
 		--fitted-model-dir results/models/task-WM_final-model-fits \
 		--data-dir data/task-WM \
@@ -296,13 +295,13 @@ results/sanity_checks figures/: scripts/sanity_checks.py scripts/fig_sanity_chec
 		--log-dir results/models/randomized_labels \
 		--run-group-name task-MOTOR_randomized-labels-fit \
 		--permute-labels True
-	poetry run python3 scripts/attribute.py
+	poetry run python3 scripts/interpret.py
 		--task MOTOR \
 		--fitted-model-dir results/models/randomized_labels/task-MOTOR_randomized-labels-fit \
 		--data-dir data/task-MOTOR \
 		--attributions-dir results/attributions/randomized_labels/task-MOTOR
 	# model randomization:
-	poetry run python3 scripts/attribute.py
+	poetry run python3 scripts/interpret.py
 		--task MOTOR \
 		--fitted-model-dir results/models/task-MOTOR_final-model-fits \
 		--data-dir data/task-MOTOR \
