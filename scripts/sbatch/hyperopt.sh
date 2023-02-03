@@ -1,4 +1,4 @@
-#!/usr/bin/env zsh
+#!/usr/bin/env bash
 #
 #SBATCH -J hyperopt            
 #SBATCH -o hyperopt.output     
