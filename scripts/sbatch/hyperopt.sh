@@ -36,10 +36,6 @@ if [[ ! -f $IMAGE ]]; then
     singularity build $IMAGE "docker://arminthomas/interpretability-comparison:rev"
 fi
 
-# wandb settings
-export SINGULARITY_WANDB_USERNAME='athms'
-# export SINGULARITY_WANDB_API_KEY=openssl base64 < configs/wandb/wandb_key.txt | tr -d "\n"
-
 # run
 singularity run \
   --nv \
