@@ -25,7 +25,7 @@ def hyperopt() -> None:
         "num_epochs": 60,
         "num_runs": 1,
         "num_folds": 3,
-        "log_dir": hyperopt_config["hyperopt_dir"],
+        "log_dir": hyperopt_config["log_dir"],
         "report_to": "tune",
         "seed": hyperopt_config["seed"]
     }
