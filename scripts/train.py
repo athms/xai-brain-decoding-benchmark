@@ -241,7 +241,7 @@ class EarlyStopping:
     def __init__(self,
         patience: int=3,
         min_delta: float=0.0,
-        grace_period: int=5
+        grace_period: int=10
         ) -> None:
 
         self.patience = patience
