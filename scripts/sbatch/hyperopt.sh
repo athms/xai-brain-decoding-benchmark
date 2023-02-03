@@ -1,11 +1,11 @@
 #!/usr/bin/env zsh
 
-#SBATCH -J hyperopt            # job name
-#SBATCH -o hyperopt.output     # output and error file name
-#SBATCH -N 1                   # number of nodes requested
-#SBATCH -n 1                   # total number of tasks requested
-#SBATCH -p gtx                 # partition/queue name (gtx, p100, v100)
-#SBATCH -t 05:00:00            # run time (hh:mm:ss)
+#SBATCH -J hyperopt            
+#SBATCH -o hyperopt.output     
+#SBATCH -N 1                   
+#SBATCH -n 1                   
+#SBATCH -p gtx                 
+#SBATCH -t 05:00:00            
 
 
 while [ $# -gt 0 ] ; do
