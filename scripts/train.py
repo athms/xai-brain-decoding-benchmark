@@ -175,9 +175,10 @@ def load_train_data(config: Dict):
                 for s in os.listdir(config["data_dir"])
                 if s.startswith('sub_')
             ]
-        ).sort()
+        )
+        subjects.sort()
         np.random.shuffle(subjects)
-        test_subjects = subjects[:len(subjects)//5] # use every 5th subject for testing
+        test_subjects = subjects[:len(subjects)//5] # we put aside 1/5 of data for testing
         train_subjects = np.array(
             [
                 s for s in subjects
@@ -194,6 +195,7 @@ def load_train_data(config: Dict):
             subjects=test_subjects,
             decoding_targets=src.target_labeling[config["task"]].keys()
         )
+        assert all([p not in train_image_paths for p in test_image_paths])
         train_test_split = {
             'train': train_image_paths,
             'test': test_image_paths
