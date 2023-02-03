@@ -64,7 +64,7 @@ def get_argparse(parser: argparse.ArgumentParser=None) -> argparse.ArgumentParse
         default='WM',
         type=str,
         help='task for which 3D-CNN is optimized '
-             '(default: WM)'
+             '(one of {WM, MOTOR, heat-rejection}; default: WM)'
     )
     parser.add_argument(
         '--data-dir',
