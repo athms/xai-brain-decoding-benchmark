@@ -12,7 +12,7 @@ while [ $# -gt 0 ] ; do
     --project-dir) PROJ_DIR=$2 ;;
     --task) TASK=${2} ;;
     --data-dir) DATA_DIR=${2} ;;
-    --log-dir) LOG_DIR=${2} ;;
+    --hyperopt-dir) HYPEROPT_DIR=${2} ;;
     --docker-image-dir) IMAGE_DIR=${2} ;;
   esac
   shift
@@ -22,7 +22,7 @@ done
 PROJ_DIR=${PROJ_DIR:-"."}
 TASK=${TASK:-"WM"}
 DATA_DIR=${DATA_DIR:-"${PROJ_DIR}/data/task-${TASK}"}
-LOG_DIR=${LOG_DIR:-"${PROJ_DIR}/results/hyperopt/task-${TASK}"}
+HYPEROPT_DIR=${HYPEROPT_DIR:-"${PROJ_DIR}/results/hyperopt/task-${TASK}"}
 mkdir -p $LOG_DIR
 IMAGE_DIR=${IMAGE_DIR:-"${PROJ_DIR}/images/"}
 
@@ -47,4 +47,4 @@ singularity run \
   python3 scripts/hyperopt.py \
     --task $TASK \
     --data-dir /data \
-    --log-dir /log_dir
+    --hyperopt-dir /hyperopt_dir
