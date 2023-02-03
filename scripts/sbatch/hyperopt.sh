@@ -21,7 +21,7 @@ done
 # set defaults
 PROJ_DIR=${PROJ_DIR:-"."}
 TASK=${TASK:-"WM"}
-DATA_DIR=${DATA_DIR:-"${PROJ_DIR}/data/task-${TASK}/trial_images"}
+DATA_DIR=${DATA_DIR:-"${PROJ_DIR}/data/task-${TASK}"}
 LOG_DIR=${LOG_DIR:-"${PROJ_DIR}/results/hyperopt/task-${TASK}"}
 mkdir -p $LOG_DIR
 IMAGE_DIR=${IMAGE_DIR:-"${PROJ_DIR}/images/"}
