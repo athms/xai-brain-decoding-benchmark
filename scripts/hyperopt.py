@@ -22,7 +22,7 @@ def hyperopt() -> None:
         "dropout": ray.tune.grid_search([0.0, 0.25, 0.5]),
         "task": hyperopt_config["task"],
         "data_dir": hyperopt_config["data_dir"],
-        "num_epochs": 60,
+        "num_epochs": 100,
         "num_runs": 1,
         "num_folds": 3,
         "log_dir": hyperopt_config["log_dir"],
