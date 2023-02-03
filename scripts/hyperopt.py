@@ -99,7 +99,7 @@ def get_hyperopt_argparse(parser: argparse.ArgumentParser=None) -> argparse.Argu
     parser.add_argument(
         '--seed',
         metavar='INT',
-        default=1234,
+        default=12345,
         type=int,
         required=False,
         help='initial random seed (default: 1234)'

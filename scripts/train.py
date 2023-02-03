@@ -335,15 +335,29 @@ def train_run(
         tensor_validation_images,
         tensor_validation_labels
     )
+
+    def seed_worker(worker_id):
+        """helper function to correctly seed dataloader workers"""
+        worker_seed = torch.initial_seed() % 2**32
+        np.random.seed(worker_seed)
+
+    train_gen = torch.Generator()
+    train_gen.manual_seed(config["seed"])
     train_dataloader = torch.utils.data.DataLoader(
         train_dataset,
         batch_size=config["batch_size"],
-        shuffle=True
+        shuffle=True,
+        generator=train_gen,
+        worker_init_fn=seed_worker
     )
+    val_gen = torch.Generator()
+    val_gen.manual_seed(config["seed"])
     validation_dataloader = torch.utils.data.DataLoader(
         validation_dataset,
         batch_size=1,
-        shuffle=False
+        shuffle=False,
+        generator=val_gen,
+        worker_init_fn=seed_worker
     )    
     model = src.model.CNNModel(
         input_shape=config["input_shape"],
@@ -690,7 +704,7 @@ def get_train_argparse(parser: argparse.ArgumentParser=None) -> argparse.Argumen
     parser.add_argument(
         '--seed',
         metavar='INT',
-        default=1234,
+        default=12345,
         type=int,
         required=False,
         help='initial random seed '
