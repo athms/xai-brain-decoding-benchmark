@@ -253,15 +253,15 @@ class EarlyStopping:
 
     def __call__(self, loss: float, epoch: int):
         
-        if loss < self.min_loss:
-            self.min_loss = loss
-        
         if epoch >= self.grace_period:
 
             if loss - self.min_loss >= self.min_delta:
                 self.counter +=1
                 if self.counter >= self.patience:  
                     self.early_stop = True
+
+        if loss < self.min_loss:
+            self.min_loss = loss
 
 
 
