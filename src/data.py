@@ -29,6 +29,7 @@ def get_subject_contrast_image_paths(
                 for s in range(1, 60)
             ]
         )
+
     contrast_image_paths = {
         label: []
         for label in contrast_labels
@@ -37,6 +38,7 @@ def get_subject_contrast_image_paths(
     for label in contrast_labels:
         
         for subject in subjects:
+
             image_path = os.path.join(
                 path,
                 '{}_sub_{}.nii'.format(
@@ -55,13 +57,16 @@ def get_subject_trial_image_paths(
       decoding_targets: Tuple[str],
       subjects: Tuple[int],
     ) -> Dict:
+
     trial_image_paths = {}
 
     for subject in subjects:
+
         subject_dir = os.path.join(
             path,
             'sub_{}'.format(subject)
         )
+
         trial_image_paths[subject] = [
             os.path.join(subject_dir, f)
             for f in os.listdir(subject_dir)
@@ -82,6 +87,7 @@ def assign_labels(
     image_paths: Dict[str, str],
     target_labeling: Dict[str, int]
     ) -> Tuple:
+
     labels = []
     
     for _, paths in image_paths.items():
@@ -103,6 +109,7 @@ def load_images(
     return_fdata: bool=False,
     smoothing_fwhm: float=None
     ) -> List:
+
     images = []
     
     for _, paths in image_paths.items():
@@ -112,15 +119,18 @@ def load_images(
             for label in target_labeling:
                 
                 if label in path.split('/')[-1]:
+
                     images.append(
                         nilearn.image.smooth_img(
                             imgs=nb.load(path),
                             fwhm=smoothing_fwhm
-                            )
                         )
+                    )
+                        
                     break
     
     if return_fdata:
+
         images = np.concatenate(
             [
                 np.expand_dims(
@@ -141,12 +151,14 @@ def load_data(
     return_fdata: bool=False,
     smoothing_fwhm: float=None
     ) -> Tuple[List, List]:
+
     images = load_images(
         image_paths=image_paths,
         target_labeling=target_labeling,
         return_fdata=return_fdata,
         smoothing_fwhm=smoothing_fwhm
     )
+
     labels = assign_labels(
         image_paths=image_paths,
         target_labeling=target_labeling
