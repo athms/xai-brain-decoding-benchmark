@@ -224,6 +224,47 @@ def load_train_data(config: Dict):
     return train_images, train_labels
 
 
+class EarlyStopping:
+    """Early stopping criterion that stops training when loss does not 
+    improve for given number of parience epochs.
+    
+    Parameters
+    ----
+    patience : int
+        Number of patience epochs
+    min_delta : float
+        minimum difference in loss that counts as meaningful change
+    grace_period : int
+        minimum number of timesteps before a training can be early stopped
+    """
+
+    def __init__(self,
+        patience: int=5,
+        min_delta: float=0.0,
+        grace_period: int=5
+        ) -> None:
+
+        self.patience = patience
+        self.min_delta = min_delta
+        self.grace_period = grace_period
+        self.min_loss = np.inf
+        self.counter = 0
+        self.early_stop = False
+
+    def __call__(self, loss: float, epoch: int):
+        
+        if loss < self.min_loss:
+            self.min_loss = loss
+        
+        if epoch >= self.grace_period:
+
+            if loss - self.min_loss >= self.min_delta:
+                self.counter +=1
+                if self.counter >= self.patience:  
+                    self.early_stop = True
+
+
+
 def train_run(
     config,
     images,
@@ -323,6 +364,8 @@ def train_run(
         lr=config["learning_rate"]
     )
 
+    earl_stopping = EarlyStopping()
+
     train_history = []
     validation_history = []
 
@@ -407,6 +450,13 @@ def train_run(
                 f'{validation_history[-1]["loss"].values[0]:.4f}, '
                 f'{validation_history[-1]["accuracy"].values[0]:.4f}'
             )
+
+        earl_stopping(loss=np.mean(eval_losses), epoch=epoch)
+        if earl_stopping.early_stop:
+            print(
+                'Stopping training as early-stopping criterion reached.'
+            )
+            break
 
     torch.save(
         model.state_dict(),
