@@ -26,7 +26,7 @@ mkdir -p $LOG_DIR
 IMAGE_DIR=${IMAGE_DIR:-"${PROJ_DIR}/images/"}
 
 # TACC-specific imports
-module load cuda/11.0
+module load cuda/11.3
 module load tacc-singularity/3.7.2
 
 # set singularity image
