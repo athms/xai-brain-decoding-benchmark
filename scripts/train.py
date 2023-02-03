@@ -176,7 +176,7 @@ def load_train_data(config: Dict):
                 if s.startswith('sub_')
             ]
         )
-        subjects.sort()
+        subjects.sort() # we sort first to ensure reproducibility of random shuffle
         np.random.shuffle(subjects)
         test_subjects = subjects[:len(subjects)//5] # we put aside 1/5 of data for testing
         train_subjects = np.array(
