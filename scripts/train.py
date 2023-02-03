@@ -517,7 +517,7 @@ def get_argparse(parser: argparse.ArgumentParser=None) -> argparse.ArgumentParse
     parser.add_argument(
         '--num-filters',
         metavar='N',
-        default=8,
+        default=16,
         type=int,
         required=False,
         help='number of 3D-CNN kernels per layer '
@@ -526,7 +526,7 @@ def get_argparse(parser: argparse.ArgumentParser=None) -> argparse.ArgumentParse
     parser.add_argument(
         '--filter-size',
         metavar='N',
-        default=3,
+        default=4,
         type=int,
         required=False,
         help='size of 3D-CNN filter per channel '
@@ -555,7 +555,7 @@ def get_argparse(parser: argparse.ArgumentParser=None) -> argparse.ArgumentParse
     parser.add_argument(
       '--learning-rate',
       metavar='FLOAT',
-      default=1e-4,
+      default=3e-4,
       type=float,
       required=False,
       help='learning rate for AdamW '
