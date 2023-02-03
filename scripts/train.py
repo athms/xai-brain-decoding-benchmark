@@ -66,6 +66,7 @@ def train(config: Dict=None) -> None:
         fold_iterator = range(config["num_folds"]) if in_fold == -1 else [in_fold]
 
         for fold in fold_iterator:
+
             config["fold"] = int(fold)
             
             if config["verbose"]:
@@ -301,9 +302,11 @@ def train_run(
     config["input_shape"] = images[0].shape
     config["n_train_images"] = images.shape[0]
     idx = np.arange(config["n_train_images"])
+    
     if config["num_folds"]>1:
         config["n_validation_images"] = int(config["n_train_images"]/config["num_folds"])
         config["validation_idx"] = idx[(config["n_validation_images"]*config["fold"]):(config["n_validation_images"]*(config["fold"]+1))]
+    
     else:
         print(
             f'\t! Using {percentage_validation*100}% of trainnig data (Total N: {config["n_train_images"]}) for validation'
@@ -313,29 +316,31 @@ def train_run(
             max(1, int(config["n_train_images"]*percentage_validation)),
             replace=False
         )
+    
     train_idx = np.array([i for i in idx if i not in config["validation_idx"]])
     assert np.all([i not in train_idx for i in config["validation_idx"]]), \
         'Validation set contains training images'
-    tensor_train_images = torch.Tensor(images[train_idx]).to(torch.float)
-    tensor_train_labels = torch.Tensor(labels[train_idx]).to(torch.long)
-    tensor_validation_images = torch.Tensor(images[config["validation_idx"]]).to(torch.float)
-    tensor_validation_labels = torch.Tensor(labels[config["validation_idx"]]).to(torch.long)
+    train_images = torch.Tensor(images[train_idx]).to(torch.float)
+    train_labels = torch.Tensor(labels[train_idx]).to(torch.long)
+    validation_images = torch.Tensor(images[config["validation_idx"]]).to(torch.float)
+    validation_labels = torch.Tensor(labels[config["validation_idx"]]).to(torch.long)
 
     if 'cuda' in config['device']:    
-        tensor_train_images = tensor_train_images.to(config['device'])
-        tensor_train_labels = tensor_train_labels.to(config['device'])
-        tensor_validation_images = tensor_validation_images.to(config['device'])
-        tensor_validation_labels = tensor_validation_labels.to(config['device'])
+        train_images = train_images.to(config['device'])
+        train_labels = train_labels.to(config['device'])
+        validation_images = validation_images.to(config['device'])
+        validation_labels = validation_labels.to(config['device'])
     
     train_dataset = torch.utils.data.TensorDataset(
-        tensor_train_images,
-        tensor_train_labels
+        train_images,
+        train_labels
     )
     validation_dataset = torch.utils.data.TensorDataset(
-        tensor_validation_images,
-        tensor_validation_labels
+        validation_images,
+        validation_labels
     )
 
+    # adapted from: https://pytorch.org/docs/stable/notes/randomness.html
     def seed_worker(worker_id):
         """helper function to correctly seed dataloader workers"""
         worker_seed = torch.initial_seed() % 2**32
@@ -359,6 +364,7 @@ def train_run(
         generator=val_gen,
         worker_init_fn=seed_worker
     )    
+
     model = src.model.CNNModel(
         input_shape=config["input_shape"],
         num_classes=np.unique(labels).size,
@@ -371,24 +377,24 @@ def train_run(
     if 'cuda' in config['device']:
         model.to(config['device'])
 
-
     xe_loss = torch.nn.CrossEntropyLoss()
     optimizer = torch.optim.Adam(
         model.parameters(),
         lr=config["learning_rate"]
     )
 
-    earl_stopping = EarlyStopping()
-
     train_history = []
     validation_history = []
+    earl_stopping = EarlyStopping()
 
     for epoch in range(config["num_epochs"]):
+        
         model.train()
         train_losses = []
         train_accuracies = [] 
 
         for batch_images, batch_labels in iter(train_dataloader):
+            
             optimizer.zero_grad()
             batch_outputs = model(batch_images)
             batch_loss = xe_loss(batch_outputs, batch_labels)
@@ -421,6 +427,7 @@ def train_run(
             eval_accuracies = []
 
             for image, label in iter(validation_dataloader):
+                
                 sample_output = model(image)
                 sample_loss = xe_loss(sample_output, label)
                 sample_acc = int(
