@@ -1,12 +1,11 @@
 #!/usr/bin/env zsh
-
+#
 #SBATCH -J hyperopt            
 #SBATCH -o hyperopt.output     
 #SBATCH -N 1                   
 #SBATCH -n 1                   
 #SBATCH -p gtx                 
 #SBATCH -t 05:00:00            
-
 
 while [ $# -gt 0 ] ; do
   case $1 in
