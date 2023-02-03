@@ -479,7 +479,7 @@ def train_run(
     )
 
 
-def get_argparse(parser: argparse.ArgumentParser=None) -> argparse.ArgumentParser:
+def get_train_argparse(parser: argparse.ArgumentParser=None) -> argparse.ArgumentParser:
     
     if parser is None:
         parser = argparse.ArgumentParser(
@@ -725,7 +725,7 @@ def make_config(config: Dict=None):
     """Generates config dictionary"""
     
     if config is None:
-        config = vars(get_argparse().parse_args())
+        config = vars(get_train_argparse().parse_args())
     
     config["verbose"] = config["verbose"] == 'True'
     config["permute_labels"] = config["permute_labels"] == 'True'
