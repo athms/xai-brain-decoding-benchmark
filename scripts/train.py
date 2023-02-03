@@ -17,7 +17,7 @@ def train(config: Dict=None) -> None:
     """Script's main function; trains 3D convolutional neural network."""
 
     config = make_config(config=config)
-    
+
     assert config["task"] in [
         'heat-rejection',
         'WM',
@@ -40,6 +40,9 @@ def train(config: Dict=None) -> None:
     )
     with open(config_filepath, 'w') as f:
         json.dump(config, f, indent=2)
+
+    torch.manual_seed(config["seed"])
+    np.random.seed(config["seed"])
 
     train_images, train_labels = load_train_data(config=config)
 
@@ -160,21 +163,21 @@ def train(config: Dict=None) -> None:
 def load_train_data(config: Dict):
     """Loads training data, given config."""
 
-    trial_image_paths_split_path = os.path.join(
-        config["log_dir"],
-        'trial_image_paths.json'
+    data_split_path = os.path.join(
+        config["data_dir"],
+        'data_split.json'
     )
 
-    if not os.path.isfile(trial_image_paths_split_path):
+    if not os.path.isfile(data_split_path):
         subjects = np.unique(
             [
                 s.split('sub_')[1]
                 for s in os.listdir(config["data_dir"])
                 if s.startswith('sub_')
             ]
-        )
-        subjects.sort()
-        test_subjects = subjects[::5] # use every 5th subject for testing
+        ).sort()
+        np.random.shuffle(subjects)
+        test_subjects = subjects[:len(subjects)//5] # use every 5th subject for testing
         train_subjects = np.array(
             [
                 s for s in subjects
@@ -191,21 +194,21 @@ def load_train_data(config: Dict):
             subjects=test_subjects,
             decoding_targets=src.target_labeling[config["task"]].keys()
         )
-        trial_image_paths_split = {
+        data_split = {
             'train': train_image_paths,
             'test': test_image_paths
         }
 
-        with open(trial_image_paths_split_path, 'w') as f:
-            json.dump(trial_image_paths_split, f, indent=2)
+        with open(data_split_path, 'w') as f:
+            json.dump(data_split, f, indent=2)
 
     else:
 
-        with open(trial_image_paths_split_path, 'r') as f:
-            trial_image_paths_split = json.load(f)
+        with open(data_split_path, 'r') as f:
+            data_split = json.load(f)
 
     train_images, train_labels = src.data.load_data(
-        image_paths=trial_image_paths_split['train'],
+        image_paths=data_split['train'],
         return_fdata=True,
         target_labeling=src.target_labeling[config["task"]]
     )
