@@ -9,7 +9,7 @@ import train
 def hyperopt() -> None:
     """Script's main function; runs 3D-CNN hyperoptimization with tune for given task."""
 
-    hyperopt_config = vars(get_argparse().parse_args())
+    hyperopt_config = vars(get_hyperopt_argparse().parse_args())
     train_config = train.make_config()
     train_config['run_group_name'] = "none" # reset so that it is autonatically generated in call to train.train()
 
@@ -51,7 +51,7 @@ def hyperopt() -> None:
     return None
 
 
-def get_argparse(parser: argparse.ArgumentParser=None) -> argparse.ArgumentParser:
+def get_hyperopt_argparse(parser: argparse.ArgumentParser=None) -> argparse.ArgumentParser:
     
     if parser is None:
         parser = argparse.ArgumentParser(
@@ -75,7 +75,7 @@ def get_argparse(parser: argparse.ArgumentParser=None) -> argparse.ArgumentParse
              '(default: data/task-WM)'
     )
     parser.add_argument(
-        '--hyperopt-dir',
+        '--log-dir',
         metavar='DIR',
         default='results/hyperopt/task-WM',
         type=str,
