@@ -23,13 +23,13 @@ TASK=${TASK:-"WM"}
 DATA_DIR=${DATA_DIR:-"${PROJ_DIR}/data/task-${TASK}/trial_images"}
 LOG_DIR=${LOG_DIR:-"${PROJ_DIR}/results/hyperopt/task-${TASK}"}
 mkdir -p $LOG_DIR
+IMAGE_DIR=${IMAGE_DIR:-"${PROJ_DIR}/images/"}
 
 # TACC-specific imports
 module load cuda/11.0
 module load tacc-singularity/3.7.2
 
 # set singularity image
-IMAGE_DIR=${IMAGE_DIR:-"${PROJ_DIR}/images/"}
 IMAGE="${IMAGE_DIR}/interpretability-comparison.simg"
 if [[ ! -f $IMAGE ]]; then
     mkdir -p "${IMAGE_DIR}"
