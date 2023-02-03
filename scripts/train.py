@@ -163,12 +163,12 @@ def train(config: Dict=None) -> None:
 def load_train_data(config: Dict):
     """Loads training data, given config."""
 
-    data_split_path = os.path.join(
+    train_test_split_path = os.path.join(
         config["data_dir"],
-        'data_split.json'
+        'train_test_split.json'
     )
 
-    if not os.path.isfile(data_split_path):
+    if not os.path.isfile(train_test_split_path):
         subjects = np.unique(
             [
                 s.split('sub_')[1]
@@ -194,21 +194,21 @@ def load_train_data(config: Dict):
             subjects=test_subjects,
             decoding_targets=src.target_labeling[config["task"]].keys()
         )
-        data_split = {
+        train_test_split = {
             'train': train_image_paths,
             'test': test_image_paths
         }
 
-        with open(data_split_path, 'w') as f:
-            json.dump(data_split, f, indent=2)
+        with open(train_test_split_path, 'w') as f:
+            json.dump(train_test_split, f, indent=2)
 
     else:
 
-        with open(data_split_path, 'r') as f:
-            data_split = json.load(f)
+        with open(train_test_split_path, 'r') as f:
+            train_test_split = json.load(f)
 
     train_images, train_labels = src.data.load_data(
-        image_paths=data_split['train'],
+        image_paths=train_test_split['train'],
         return_fdata=True,
         target_labeling=src.target_labeling[config["task"]]
     )
