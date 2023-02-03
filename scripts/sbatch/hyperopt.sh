@@ -19,6 +19,7 @@ while [ $# -gt 0 ] ; do
 done
 
 # set defaults
+PROJ_DIR=${PROJ_DIR:-"."}
 TASK=${TASK:-"WM"}
 DATA_DIR=${DATA_DIR:-"${PROJ_DIR}/data/task-${TASK}/trial_images"}
 LOG_DIR=${LOG_DIR:-"${PROJ_DIR}/results/hyperopt/task-${TASK}"}
