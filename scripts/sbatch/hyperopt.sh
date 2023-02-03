@@ -19,13 +19,17 @@ while [ $# -gt 0 ] ; do
   shift
 done
 
+# set defaults
 TASK=${TASK:-"WM"}
 DATA_DIR=${DATA_DIR:-"${PROJ_DIR}/data/task-${TASK}/trial_images"}
 LOG_DIR=${LOG_DIR:-"${PROJ_DIR}/results/hyperopt/task-${TASK}"}
+mkdir -p $LOG_DIR
 
+# TACC-specific imports
 module load cuda/11.0
 module load tacc-singularity/3.7.2
 
+# set singularity image
 IMAGE_DIR=${IMAGE_DIR:-"${PROJ_DIR}/images/"}
 IMAGE="${IMAGE_DIR}/interpretability-comparison.simg"
 if [[ ! -f $IMAGE ]]; then
@@ -33,11 +37,11 @@ if [[ ! -f $IMAGE ]]; then
     singularity build $IMAGE "docker://arminthomas/interpretability-comparison:rev"
 fi
 
+# wandb settings
 export SINGULARITY_WANDB_USERNAME='athms'
 # export SINGULARITY_WANDB_API_KEY=openssl base64 < configs/wandb/wandb_key.txt | tr -d "\n"
 
-mkdir -p $LOG_DIR
-
+# run
 singularity run \
   --nv \
   --cleanenv \
