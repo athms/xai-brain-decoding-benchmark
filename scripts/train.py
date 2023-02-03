@@ -452,6 +452,9 @@ def train_run(
 
         early_stopping(loss=np.mean(eval_losses), epoch=epoch)
         if early_stopping.early_stop:
+            print(
+                '/!\ Stopping training due to specified early-stopping criterion.'
+            )
             break
 
     torch.save(
