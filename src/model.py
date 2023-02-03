@@ -7,8 +7,7 @@ from typing import Tuple
 
 class CNNModel(torch.nn.Module):
 
-    def __init__(
-        self,
+    def __init__(self,
         input_shape: Tuple[int, int],
         num_classes: int,
         num_filters: int=8,
@@ -17,6 +16,7 @@ class CNNModel(torch.nn.Module):
         dropout: float=0.1
         ) -> None:
         super().__init__()
+        
         self.num_hidden_layers = num_hidden_layers
         self.filter_size = filter_size
         self.stride = 2
@@ -24,21 +24,22 @@ class CNNModel(torch.nn.Module):
         self.input_shape = input_shape
         self.num_classes = num_classes
         self.dropout = dropout
-        layer_stack = []
+        
+        layer_stack = torch.nn.ModuleList([])
         out_shape = np.array(input_shape[1:])
         for i in range(self.num_hidden_layers):
     
             if np.any((out_shape - (filter_size-1) - 1)//self.stride + 1) <= 0:
                 print(
                     f'/!\ Warning: out_shape would be <= 0; '
-                    f'thus reducing num_hidden_layers to {i}'
+                    f'reducing num_hidden_layers to {i}'
                 )
                 break
                 
             elif np.any(out_shape < np.ones(3)*self.filter_size):
                 print(
                     f'/!\ Warning: out_shape smaller than filter_size; '
-                    f'thus reducing num_hidden_layers to {i}'
+                    f'reducing num_hidden_layers to {i}'
                 )
                 break
             
@@ -57,6 +58,7 @@ class CNNModel(torch.nn.Module):
                         torch.nn.Dropout3d(p=self.dropout)
                     ]
                 )
+                
         layer_stack.extend(
             [
                 torch.nn.Flatten(),
@@ -68,8 +70,5 @@ class CNNModel(torch.nn.Module):
         )
         self.model = torch.nn.Sequential(*layer_stack)
 
-    def forward(
-        self,
-        inputs: torch.Tensor
-        ) -> torch.tensor:  
+    def forward(self, inputs: torch.Tensor) -> torch.tensor:  
         return self.model(inputs)
