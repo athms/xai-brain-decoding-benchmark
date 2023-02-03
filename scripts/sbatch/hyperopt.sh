@@ -41,7 +41,7 @@ fi
 singularity run \
   --nv \
   --cleanenv \
-  -B $DATA_DIR:/data:ro \
+  -B $DATA_DIR:/data \
   -B $LOG_DIR:/log_dir \
   $IMAGE \
   python3 scripts/hyperopt.py \
