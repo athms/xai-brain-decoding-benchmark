@@ -34,7 +34,7 @@ module load tacc-singularity/3.7.2
 IMAGE="${IMAGE_DIR}/interpretability-comparison.simg"
 if [[ ! -f $IMAGE ]]; then
     mkdir -p "${IMAGE_DIR}"
-    singularity build $IMAGE "docker://arminthomas/interpretability-comparison:rev"
+    singularity build $IMAGE "docker://arminthomas/interpretability-comparison:dev"
 fi
 
 # run
