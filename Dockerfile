@@ -46,18 +46,24 @@ RUN python3 -m \
 RUN python3 -m \
     pip install \
     --no-cache-dir \
-    torch==1.11.0 \
+    torch>=1.13.1 \
     --extra-index-url https://download.pytorch.org/whl/cu113
 
+# pip installs for which we want to specify package versions
 RUN python3 -m \
     pip install \
     --no-cache-dir \
-    wandb==0.12.11 \
-    captum==0.5.0 \
-    nilearn==0.9.0 \
-    seaborn==0.11.2 \
-    gitdir==1.2.5 \
-    ray[tune]==1.11.0 \
-    zennit==0.4.5
+    captum>=0.5 \
+    nilearn>=0.9.0 \
+    ray[tune]>=1.11.0 \
+    zennit>=0.4.5
+
+# pip install where we do not care about specific packages versions
+RUN python3 -m \
+    pip install \
+    --no-cache-dir \
+    wandb \
+    seaborn \
+    gitdir
 
 CMD bash
