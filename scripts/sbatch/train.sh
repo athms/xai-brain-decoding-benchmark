@@ -34,6 +34,7 @@ while [ $# -gt 0 ] ; do
     --seed) SEED=$2 ;;
     --permute-labels) PERMUTE_LABELS=$2 ;;
     --model-config) MODEL_CONFIG=$2 ;;
+    --docker-image-dir) IMAGE_DIR=${2} ;;
   esac
   shift
 done
@@ -46,7 +47,7 @@ N_FILTERS=${N_FILTERS:-8}
 FILTER_SIZE=${FILTER_SIZE:-3}
 BS=${BS:-32}
 EPOCHS=${EPOCHS:-40}
-LR=${LR:-1e-4}
+LR=${LR:-3e-4}
 DROPOUT=${DROPOUT:-0.25}
 RUNS=${RUNS:-10}
 FOLDS=${FOLDS:-3}
@@ -60,9 +61,10 @@ WANDB_PROJECT=${WANDB_PROJECT:-"interpretability-comparison"}
 WANDB_MODE=${WANDB_MODE:-"online"}
 SMOKE_TEST=${SMOKE_TEST:-"False"}
 VERBOSE=${VERBOSE:-"True"}
-SEED=${SEED:-1}
+SEED=${SEED:-12345}
 PERMUTE_LABELS=${PERMUTE_LABELS:-"False"}
 MODEL_CONFIG=${MODEL_CONFIG:-"none"}
+IMAGE_DIR=${IMAGE_DIR:-"${PROJ_DIR}/images/"}
 
 # TACC-specific imports
 module load cuda/11.3
