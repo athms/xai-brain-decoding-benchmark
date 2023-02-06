@@ -247,7 +247,7 @@ class EarlyStopping:
     def __init__(self,
         patience: int=3,
         min_delta: float=0.0,
-        grace_period: int=10
+        grace_period: int=15
         ) -> None:
 
         self.patience = patience
@@ -265,6 +265,8 @@ class EarlyStopping:
                 self.counter +=1
                 if self.counter >= self.patience:  
                     self.early_stop = True
+            else:
+                self.counter = 0
 
         if loss < self.min_loss:
             self.min_loss = loss
