@@ -44,7 +44,7 @@ fi
 singularity run \
   --nv \
   --cleanenv \
-  -B $MODEL_DIR:/model:ro 
+  -B $MODEL_DIR:/model:ro \
   -B $DATA_DIR:/data:ro \
   -B $ATTR_DIR:/attr \
   $IMAGE \
