@@ -41,7 +41,7 @@ done
 
 # set defaults
 TASK=${TASK:-"WM"}
-DATA_DIR=${DATA_DIR:-"data/task-WM"}
+DATA_DIR=${DATA_DIR:-"${PROJ_DIR}/data/task-WM"}
 N_HIDDEN=${N_HIDDEN:-4}
 N_FILTERS=${N_FILTERS:-8}
 FILTER_SIZE=${FILTER_SIZE:-3}
@@ -53,7 +53,7 @@ RUNS=${RUNS:-10}
 FOLDS=${FOLDS:-3}
 RUN=${RUN:--1}
 FOLD=${FOLD:--1}
-LOG_DIR=${LOG_DIR:-'results/models/'}
+LOG_DIR=${LOG_DIR:-"${PROJ_DIR}/results/models/"}
 RUN_GROUP_NAME=${RUN_GROUP_NAME:-"none"}
 REPORT_TO=${REPORT_TO:-"wandb"}
 WANDB_ENTITY=${WANDB_ENTITY:-"athms"}
@@ -82,7 +82,6 @@ singularity run \
   --nv \
   --cleanenv \
   -B $DATA_DIR:/data:ro \
-  -B $LOG_DIR:/log_dir \
   $IMAGE \
   python3 scripts/train.py \
     --task $TASK \
@@ -98,7 +97,7 @@ singularity run \
     --num-folds $FOLDS \
     --run $RUN \
     --fold $FOLD \
-    --log-dir /log_dir \
+    --log-dir $LOG_DIR \
     --run-group $RUN_GROUP_NAME \
     --report-to $REPORT_TO \
     --wandb-entity $WANDB_ENTITY \
