@@ -3,6 +3,7 @@
 import os
 import argparse
 import pandas as pd
+from scipy.stats import pearsonr
 from sklearn.feature_selection import mutual_info_regression
 from nilearn.masking import compute_background_mask, apply_mask
 
@@ -118,11 +119,16 @@ def compute_brain_map_similarities(config=None) -> None:
                     y=apply_mask(bold_image_path, mask_img),
                     discrete_features=False
                 )
+                r, p = pearsonr(
+                    apply_mask(attribution_image_path, mask_img).reshape(-1,1),
+                    apply_mask(bold_image_path, mask_img)
+                )
                 brain_map_similarities.append(
                     pd.DataFrame(
                         data={
                             'method': attribution_method,
                             'mi': mi,
+                            'r': r, 
                             'bold_image': bold_image_path,
                             'attribution_image': attribution_image_path,
                             'contrast': bold_image_path.split('/')[-1].split('_')[0]
