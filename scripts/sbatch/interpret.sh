@@ -53,4 +53,4 @@ singularity run \
     --fitted-model-dir /model \
     --data-dir /data \
     --attributions-dir /attr \
-    --use-random-init $RAND_INIT \
+    --use-random-init $RAND_INIT
