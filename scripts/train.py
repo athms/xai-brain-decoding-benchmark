@@ -639,6 +639,7 @@ def get_train_argparse(parser: argparse.ArgumentParser=None) -> argparse.Argumen
            '(default: -1)'
     )
 
+
     parser.add_argument(
       '--stopping-patience',
       metavar='INT',
