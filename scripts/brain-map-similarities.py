@@ -128,7 +128,7 @@ def compute_brain_map_similarities(config=None) -> None:
                         data={
                             'method': attribution_method,
                             'mi': mi,
-                            'r': r, 
+                            'r': r,
                             'bold_image': bold_image_path,
                             'attribution_image': attribution_image_path,
                             'contrast': bold_image_path.split('/')[-1].split('_')[0]
