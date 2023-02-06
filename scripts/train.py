@@ -392,7 +392,11 @@ def train_run(
 
     train_history = []
     validation_history = []
-    earl_stopping = EarlyStopping()
+    earl_stopping = EarlyStopping(
+        patience=config['stopping_patience'],
+        min_delta=config['stopping_delta'],
+        grace_period=config['stopping_grace']
+    )
 
     for epoch in range(config["num_epochs"]):
         
@@ -635,6 +639,33 @@ def get_train_argparse(parser: argparse.ArgumentParser=None) -> argparse.Argumen
            '(default: -1)'
     )
 
+    parser.add_argument(
+      '--stopping-patience',
+      metavar='INT',
+      default=3,
+      type=int,
+      required=False,
+      help='number of checks before training is stopped '
+           '(default: 3)'
+    )
+    parser.add_argument(
+      '--stopping-delta',
+      metavar='FLOAT',
+      default=0.0,
+      type=float,
+      required=False,
+      help='minimum change in eval loss to qualify as an improvement'
+           '(default: 0.0)'
+    )
+    parser.add_argument(
+      '--stopping-grace',
+      metavar='INT',
+      default=15,
+      type=int,
+      required=False,
+      help='minimum number of training epochs before training can be stopped '
+           '(default: 15)'
+    )
 
     parser.add_argument(
         '--log-dir',
