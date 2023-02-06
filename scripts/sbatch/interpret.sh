@@ -25,8 +25,8 @@ PROJ_DIR=${PROJ_DIR:-"."}
 TASK=${TASK:-"WM"}
 DATA_DIR=${DATA_DIR:-"${PROJ_DIR}/data/task-${TASK}"}
 ATTR_DIR=${ATTR_DIR:-"${PROJ_DIR}/results/attributions/task-${TASK}"}
+mkdir -p $ATTR_DIR
 RAND_INIT=${ATTR_DIR:-"False"}
-mkdir -p $LOG_DIR
 IMAGE_DIR=${IMAGE_DIR:-"${PROJ_DIR}/images/"}
 
 # TACC-specific imports
