@@ -23,6 +23,9 @@ while [ $# -gt 0 ] ; do
     --num-folds) FOLDS=$2 ;;
     --run) RUN=$2 ;;
     --fold) FOLD=$2 ;;
+    --stopping-patience) STOP_PATIENCE=$2 ;;
+    --stopping-delta) STOP_DELTA=$2 ;;
+    --stopping-grace) STOP_GRACE=$2 ;;
     --log-dir) LOG_DIR=$2 ;;
     --run-group-name) RUN_GROUP_NAME=$2 ;;
     --report-to) REPORT_TO=$2 ;;
@@ -53,6 +56,9 @@ RUNS=${RUNS:-10}
 FOLDS=${FOLDS:-3}
 RUN=${RUN:--1}
 FOLD=${FOLD:--1}
+STOP_PATIENCE=${STOP_PATIENCE:--15}
+STOP_DELTA=${STOP_DELTA:--0.0}
+STOP_GRACE=${STOP_GRACE:--3}
 LOG_DIR=${LOG_DIR:-"${PROJ_DIR}/results/models/"}
 RUN_GROUP_NAME=${RUN_GROUP_NAME:-"none"}
 REPORT_TO=${REPORT_TO:-"wandb"}
@@ -97,6 +103,9 @@ singularity run \
     --num-folds $FOLDS \
     --run $RUN \
     --fold $FOLD \
+    --stopping-patience $STOP_PATIENCE \
+    --stopping-delta $STOP_DELTA \
+    --stopping-grace $STOP_GRACE \
     --log-dir $LOG_DIR \
     --run-group $RUN_GROUP_NAME \
     --report-to $REPORT_TO \
