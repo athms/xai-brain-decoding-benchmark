@@ -23,6 +23,7 @@ done
 # set defaults
 PROJ_DIR=${PROJ_DIR:-"."}
 TASK=${TASK:-"WM"}
+MODEL_DIR=${MODEL_DIR:-"${PROJ_DIR}/results/models/task-${TASK}_final-model-fits"}
 DATA_DIR=${DATA_DIR:-"${PROJ_DIR}/data/task-${TASK}"}
 ATTR_DIR=${ATTR_DIR:-"${PROJ_DIR}/results/attributions/task-${TASK}"}
 mkdir -p $ATTR_DIR
