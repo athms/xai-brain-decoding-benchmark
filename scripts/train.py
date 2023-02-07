@@ -278,7 +278,7 @@ def train_run(
     images,
     labels,
     wandb_run = None,
-    percentage_validation: float=0.05,
+    percentage_validation: float=0.1,
     ) -> Tuple[pd.DataFrame, pd.DataFrame]:
     """
     Trains 3D convolutional neural network, given config, images, and labels.
