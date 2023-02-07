@@ -419,6 +419,7 @@ def train_run(
         min_delta=config['stopping_delta'],
         grace_period=config['stopping_grace']
     )
+    best_eval_loss = np.inf
 
     for epoch in range(config["num_epochs"]):
         
@@ -482,6 +483,17 @@ def train_run(
                 index=[epoch]
             )
         )
+
+        if np.mean(eval_losses) < best_eval_loss:
+            best_eval_loss = np.mean(eval_losses)
+            # save best model
+            torch.save(
+                model.state_dict(),
+                os.path.join(
+                    config["run_log_dir"],
+                    'best_model.pt'
+                )
+            )
         
         if config["report_to"] == "wandb":
              wandb_run.log(
