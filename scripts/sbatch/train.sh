@@ -46,7 +46,7 @@ done
 
 # set defaults
 TASK=${TASK:-"WM"}
-DATA_DIR=${DATA_DIR:-"${PROJ_DIR}/data/task-WM"}
+DATA_DIR=${DATA_DIR:-"${PROJ_DIR}/data/task-${TASK}"}
 N_HIDDEN=${N_HIDDEN:-4}
 N_FILTERS=${N_FILTERS:-8}
 FILTER_SIZE=${FILTER_SIZE:-3}
