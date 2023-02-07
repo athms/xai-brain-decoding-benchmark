@@ -269,7 +269,8 @@ class EarlyStopping:
         if epoch >= self.grace_period:
 
             dff_to_best = (metric - self.best_metric)
-            no_improvement = dff_to_best>=self.min_delta if self.mode == 'min' else dff_to_best<=self.min_delta
+            no_improvement = dff_to_best>=self.min_delta if self.mode=='min' else dff_to_best<=self.min_delta
+            
             if no_improvement:
                 self.counter +=1
                 if self.counter >= self.patience:  
@@ -494,7 +495,7 @@ def train_run(
                 f'{validation_history[-1]["accuracy"].values[0]:.4f}'
             )
 
-        earl_stopping(metric=validation_history[-1]['loss'], epoch=epoch)
+        earl_stopping(metric=np.mean(eval_losses), epoch=epoch)
         if earl_stopping.early_stop:
             print(
                 'Stopping training as early-stopping criterion reached.'
