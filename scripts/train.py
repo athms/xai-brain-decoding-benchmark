@@ -417,7 +417,9 @@ def train_run(
     earl_stopping = EarlyStopping(
         patience=config['stopping_patience'],
         min_delta=config['stopping_delta'],
-        grace_period=config['stopping_grace']
+        grace_period=config['stopping_grace'],
+        plateau_std=config['stopping-plateau-std'],
+        plateau_n=config['stopping-plateau-n']
     )
     best_eval_loss = np.inf
 
@@ -701,6 +703,25 @@ def get_train_argparse(parser: argparse.ArgumentParser=None) -> argparse.Argumen
       help='minimum number of training epochs before training can be stopped '
            '(default: 20)'
     )
+    parser.add_argument(
+      '--stopping-plateau-std',
+      metavar='FLOAT',
+      default=0.01,
+      type=float,
+      required=False,
+      help='std threshold to determine whether training run is plateauing '
+           '(default: 0.01)'
+    )
+    parser.add_argument(
+      '--stopping-plateau-n',
+      metavar='INT',
+      default=10,
+      type=int,
+      required=False,
+      help='determines how many last eval loss values are taken into account in plateau evaluation '
+           '(default: 10)'
+    )
+
 
     parser.add_argument(
         '--log-dir',

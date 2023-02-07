@@ -26,6 +26,8 @@ while [ $# -gt 0 ] ; do
     --stopping-patience) STOP_PATIENCE=$2 ;;
     --stopping-delta) STOP_DELTA=$2 ;;
     --stopping-grace) STOP_GRACE=$2 ;;
+    --stopping-plateau-std) STOP_PSTD=$2 ;;
+    --stopping-plateau-n) STOP_PN=$2 ;;
     --log-dir) LOG_DIR=$2 ;;
     --run-group-name) RUN_GROUP_NAME=$2 ;;
     --report-to) REPORT_TO=$2 ;;
@@ -59,6 +61,8 @@ FOLD=${FOLD:--1}
 STOP_PATIENCE=${STOP_PATIENCE:-3}
 STOP_DELTA=${STOP_DELTA:-0.02}
 STOP_GRACE=${STOP_GRACE:-20}
+STOP_PSTD=${STOP_GRACE:-0.01}
+STOP_PN=${STOP_GRACE:-10}
 LOG_DIR=${LOG_DIR:-"${PROJ_DIR}/results/models/"}
 RUN_GROUP_NAME=${RUN_GROUP_NAME:-"none"}
 REPORT_TO=${REPORT_TO:-"wandb"}
@@ -106,6 +110,8 @@ singularity run \
     --stopping-patience $STOP_PATIENCE \
     --stopping-delta $STOP_DELTA \
     --stopping-grace $STOP_GRACE \
+    --stopping-plateau-std $STOP_PSTD \
+    --stopping-plateau-n $STOP_N \
     --log-dir $LOG_DIR \
     --run-group $RUN_GROUP_NAME \
     --report-to $REPORT_TO \
