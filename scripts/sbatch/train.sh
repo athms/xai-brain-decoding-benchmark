@@ -111,7 +111,7 @@ singularity run \
     --stopping-delta $STOP_DELTA \
     --stopping-grace $STOP_GRACE \
     --stopping-plateau-std $STOP_PSTD \
-    --stopping-plateau-n $STOP_N \
+    --stopping-plateau-n $STOP_PN \
     --log-dir $LOG_DIR \
     --run-group $RUN_GROUP_NAME \
     --report-to $REPORT_TO \
