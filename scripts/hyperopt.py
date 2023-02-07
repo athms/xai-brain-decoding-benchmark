@@ -18,7 +18,7 @@ def hyperopt() -> None:
         "num_filters": ray.tune.grid_search([4, 8, 16, 32]),
         "filter_size": ray.tune.grid_search([3, 5]),
         "batch_size": ray.tune.grid_search([32, 64]),
-        "learning_rate": ray.tune.grid_search([1e-4, 3e-4, 1e-3]),
+        "learning_rate": ray.tune.grid_search([3e-4, 1e-3]),
         "dropout": ray.tune.grid_search([0.0, 0.25, 0.5]),
         "task": hyperopt_config["task"],
         "data_dir": hyperopt_config["data_dir"],
