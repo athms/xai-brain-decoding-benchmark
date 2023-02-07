@@ -247,7 +247,7 @@ class EarlyStopping:
     def __init__(self,
         patience: int=3,
         min_delta: float=0.0,
-        grace_period: int=25
+        grace_period: int=20
         ) -> None:
 
         self.patience = patience
@@ -661,7 +661,7 @@ def get_train_argparse(parser: argparse.ArgumentParser=None) -> argparse.Argumen
     parser.add_argument(
       '--stopping-grace',
       metavar='INT',
-      default=25,
+      default=20,
       type=int,
       required=False,
       help='minimum number of training epochs before training can be stopped '
