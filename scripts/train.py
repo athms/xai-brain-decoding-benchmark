@@ -250,9 +250,9 @@ class EarlyStopping:
 
     def __init__(self,
         patience: int=3,
-        min_delta: float=0.01,
+        min_delta: float=0.02,
         grace_period: int=20,
-        mode='max'
+        mode='min'
         ) -> None:
 
         self.patience = patience
@@ -268,12 +268,9 @@ class EarlyStopping:
         
         if epoch >= self.grace_period:
 
-            if self.mode == 'min':
-                no_improvemement = (metric - self.best_metric) >= self.min_delta
-            else:
-                no_improvemement = (metric - self.best_metric) <= self.min_delta
-            
-            if no_improvemement:
+            dff_to_best = (metric - self.best_metric)
+            no_improvement = dff_to_best>=self.min_delta if self.mode == 'min' else dff_to_best<=self.min_delta
+            if no_improvement:
                 self.counter +=1
                 if self.counter >= self.patience:  
                     self.early_stop = True
@@ -497,7 +494,7 @@ def train_run(
                 f'{validation_history[-1]["accuracy"].values[0]:.4f}'
             )
 
-        earl_stopping(metric=np.mean(eval_accuracies), epoch=epoch)
+        earl_stopping(metric=validation_history[-1]['loss'], epoch=epoch)
         if earl_stopping.early_stop:
             print(
                 'Stopping training as early-stopping criterion reached.'
@@ -666,7 +663,7 @@ def get_train_argparse(parser: argparse.ArgumentParser=None) -> argparse.Argumen
     parser.add_argument(
       '--stopping-delta',
       metavar='FLOAT',
-      default=0.01,
+      default=0.02,
       type=float,
       required=False,
       help='minimum change in eval loss to qualify as an improvement'
