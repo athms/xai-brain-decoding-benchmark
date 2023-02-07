@@ -269,9 +269,9 @@ class EarlyStopping:
         if epoch >= self.grace_period:
 
             dff_to_best = (metric - self.best_metric)
-            no_improvement = dff_to_best>=self.min_delta if self.mode=='min' else dff_to_best<=self.min_delta
+            not_better = dff_to_best>=self.min_delta if self.mode=='min' else dff_to_best<=self.min_delta
             
-            if no_improvement:
+            if not_better:
                 self.counter +=1
                 if self.counter >= self.patience:  
                     self.early_stop = True
