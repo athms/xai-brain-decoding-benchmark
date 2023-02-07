@@ -251,21 +251,27 @@ class EarlyStopping:
     def __init__(self,
         patience: int=3,
         min_delta: float=0.02,
+        plateau_std: float=0.01,
+        plateau_n: float=10,
         grace_period: int=20,
         mode='min'
         ) -> None:
 
         self.patience = patience
         self.min_delta = min_delta
+        self.plateau_std = plateau_std
+        self.plateau_n = plateau_n
         self.grace_period = grace_period
         self.mode = mode
         assert self.mode in {'min', 'max'}
         self.best_metric = np.inf if self.mode=='min' else -np.inf
+        self.prev_results = []
         self.counter = 0
         self.early_stop = False
 
     def __call__(self, metric: float, epoch: int):
         
+        self.prev_results.append(metric)
         if epoch >= self.grace_period:
 
             dff_to_best = (metric - self.best_metric)
@@ -277,6 +283,10 @@ class EarlyStopping:
                     self.early_stop = True
             else:
                 self.counter = 0
+
+            is_plateau = np.std(self.prev_results[-self.plateau_n:]) <= self.plateau_std 
+            if is_plateau:
+                self.early_stop = True
         
         if self.mode == 'min':
             self.best_metric = metric if metric < self.best_metric else self.best_metric
