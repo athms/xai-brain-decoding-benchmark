@@ -47,9 +47,10 @@ def identify_best_model_configuration(config=None) -> None:
 
                 if os.path.exists(model_train_performance_path) and os.path.isfile(model_validation_performance_path):
                     model_train_performance = pd.read_csv(model_train_performance_path)
-                    fold_train_errors.append(100 - (model_train_performance.tail(1)['accuracy']*100) )
                     model_validation_performance = pd.read_csv(model_validation_performance_path)
-                    fold_validation_errors.append(100 - (model_validation_performance.tail(1)['accuracy']*100) )
+                    best_epoch = model_validation_performance['epoch'].values[np.argmin(model_validation_performance['loss'])]
+                    fold_train_errors.append(100 - (model_train_performance[model_train_performance['epoch']==best_epoch, 'accuracy']*100) )
+                    fold_validation_errors.append(100 - (model_validation_performance[model_validation_performance['epoch']==best_epoch, 'accuracy']*100) )
 
             run_train_errors.append(np.mean(fold_train_errors))
             run_validation_errors.append(np.mean(fold_validation_errors))
