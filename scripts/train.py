@@ -497,7 +497,7 @@ def train_run(
                 f'{validation_history[-1]["accuracy"].values[0]:.4f}'
             )
 
-        earl_stopping(loss=np.mean(eval_accuracies), epoch=epoch)
+        earl_stopping(metric=np.mean(eval_accuracies), epoch=epoch)
         if earl_stopping.early_stop:
             print(
                 'Stopping training as early-stopping criterion reached.'
