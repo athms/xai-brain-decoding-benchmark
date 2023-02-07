@@ -242,34 +242,48 @@ class EarlyStopping:
         minimum difference in loss that counts as meaningful change
     grace_period : int
         minimum number of timesteps before a training can be early stopped
+    mode : str
+        in 'min' mode, training will stop when the quantity monitored has 
+        stopped decreasing and in 'max' mode it will stop when the quantity 
+        monitored has stopped increasing
     """
 
     def __init__(self,
         patience: int=3,
-        min_delta: float=0.0,
-        grace_period: int=20
+        min_delta: float=0.01,
+        grace_period: int=20,
+        mode='max'
         ) -> None:
 
         self.patience = patience
         self.min_delta = min_delta
         self.grace_period = grace_period
-        self.min_loss = np.inf
+        self.mode = mode
+        assert self.mode in {'min', 'max'}
+        self.best_metric = np.inf if self.mode=='min' else -np.inf
         self.counter = 0
         self.early_stop = False
 
-    def __call__(self, loss: float, epoch: int):
+    def __call__(self, metric: float, epoch: int):
         
         if epoch >= self.grace_period:
 
-            if (loss - self.min_loss) >= self.min_delta:
+            if self.mode == 'min':
+                no_improvemement = (metric - self.best_metric) >= self.min_delta
+            else:
+                no_improvemement = (metric - self.best_metric) <= self.min_delta
+            
+            if no_improvemement:
                 self.counter +=1
                 if self.counter >= self.patience:  
                     self.early_stop = True
             else:
                 self.counter = 0
-
-        if loss < self.min_loss:
-            self.min_loss = loss
+        
+        if self.mode == 'min':
+            self.best_metric = metric if metric < self.best_metric else self.best_metric
+        else:
+            self.best_metric = metric if metric > self.best_metric else self.best_metric
 
 
 
@@ -483,7 +497,7 @@ def train_run(
                 f'{validation_history[-1]["accuracy"].values[0]:.4f}'
             )
 
-        earl_stopping(loss=np.mean(eval_losses), epoch=epoch)
+        earl_stopping(loss=np.mean(eval_accuracies), epoch=epoch)
         if earl_stopping.early_stop:
             print(
                 'Stopping training as early-stopping criterion reached.'
@@ -652,11 +666,11 @@ def get_train_argparse(parser: argparse.ArgumentParser=None) -> argparse.Argumen
     parser.add_argument(
       '--stopping-delta',
       metavar='FLOAT',
-      default=0.0,
+      default=0.1,
       type=float,
       required=False,
       help='minimum change in eval loss to qualify as an improvement'
-           '(default: 0.0)'
+           '(default: 0.1)'
     )
     parser.add_argument(
       '--stopping-grace',
@@ -665,7 +679,7 @@ def get_train_argparse(parser: argparse.ArgumentParser=None) -> argparse.Argumen
       type=int,
       required=False,
       help='minimum number of training epochs before training can be stopped '
-           '(default: 15)'
+           '(default: 20)'
     )
 
     parser.add_argument(
