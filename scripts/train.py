@@ -418,8 +418,8 @@ def train_run(
         patience=config['stopping_patience'],
         min_delta=config['stopping_delta'],
         grace_period=config['stopping_grace'],
-        plateau_std=config['stopping-plateau-std'],
-        plateau_n=config['stopping-plateau-n']
+        plateau_std=config['stopping_plateau_std'],
+        plateau_n=config['stopping_plateau_n']
     )
     best_eval_loss = np.inf
 
