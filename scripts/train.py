@@ -666,11 +666,11 @@ def get_train_argparse(parser: argparse.ArgumentParser=None) -> argparse.Argumen
     parser.add_argument(
       '--stopping-delta',
       metavar='FLOAT',
-      default=0.1,
+      default=0.01,
       type=float,
       required=False,
       help='minimum change in eval loss to qualify as an improvement'
-           '(default: 0.1)'
+           '(default: 0.01)'
     )
     parser.add_argument(
       '--stopping-grace',
