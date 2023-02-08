@@ -171,16 +171,19 @@ def fig_decoding_performance(config: Dict=None) -> None:
                 ['training', 'validation'],
                 [train_history, val_history]
             )
-        ):
+        ):  
+            max_epoch = 0
             for run in history['run'].unique():
                 history_run = history[history['run']==run].copy()
                 axs[history_i].plot(
                     history_run['epoch'],
                     history_run['accuracy']*100,
                     color='gray',
-                    alpha=0.75,
-                    lw=1,
+                    alpha=0.5,
+                    lw=0.5,
                 )
+                if history_run['epoch'].max() > max_epoch:
+                    max_epoch = history_run['epoch'].max()
             # history_grouped = history.groupby(['run', 'epoch']).accuracy.mean().groupby('epoch')
             # history_min = history_grouped.min() * 100
             # history_max = history_grouped.max() * 100
@@ -203,10 +206,10 @@ def fig_decoding_performance(config: Dict=None) -> None:
             #     linewidth=0.0
             # )
             axs[history_i].set_ylim(0, 100)
-            axs[history_i].set_xlim(0, 40)
-            epochs = np.arange(1, 100)
-            axs[history_i].set_xticks(epochs[::10])
-            axs[history_i].set_xticklabels([e if e%20==0 else '' for e in epochs[::10]])
+            axs[history_i].set_xlim(0, max_epoch)
+            epochs = np.arange(1, max_epoch+20, 20)
+            axs[history_i].set_xticks(epochs)
+            axs[history_i].set_xticklabels(epochs)
 
         # compute average confusion matrix and final decoding accuracies:
         conf_mat = np.zeros((num_labels, num_labels))
@@ -332,7 +335,7 @@ def fig_decoding_performance(config: Dict=None) -> None:
 
     for label in list('ABCDEFGHIJKL'):
         fig_axs[label].text(
-            -0.2,
+            -0.25,
             1.2,
             label,
             transform=fig_axs[label].transAxes,
