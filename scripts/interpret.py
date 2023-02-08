@@ -258,8 +258,8 @@ def interpret_w_method(
     }:
         attributer = attribution_method(model)
         baselines = (
-            torch.zeros_like(image),
-            torch.tensor(test_images.mean(axis=0, keepdims=True)).to(torch.float),
+            torch.zeros_like(image, device=device),
+            torch.tensor(test_images.mean(axis=0, keepdims=True), device=device).to(torch.float),
         )
         attribution = []
 
@@ -289,7 +289,7 @@ def interpret_w_method(
         attribution = attributer.attribute(
             inputs=image,
             target=label,
-            baselines=torch.tensor(test_images[baselines_idx]).to(torch.float)
+            baselines=torch.tensor(test_images[baselines_idx], device=device).to(torch.float)
         )
 
     elif name_attribution_method == 'GuidedGradCam':
