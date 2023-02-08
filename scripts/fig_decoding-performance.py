@@ -306,7 +306,7 @@ def fig_decoding_performance(config: Dict=None) -> None:
             center=50,
             square=True,
             annot=True,
-            annot_kws={'size': 8},
+            annot_kws={'size': 7},
             linewidths=.5,
             cbar_kws={
                 "shrink": .5,
