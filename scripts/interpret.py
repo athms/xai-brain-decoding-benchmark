@@ -38,9 +38,8 @@ def interpret(config: Dict=None) -> None:
     np.random.seed(config["seed"])
     torch.manual_seed(config["seed"])
 
-    assert config['task'] in config['fitted_model_dir'], \
-        f'model in {config["fitted_model_dir"]} does not match specified task {config["task"]}'
     model_config = json.load(open(os.path.join(config['fitted_model_dir'], 'config.json')))
+    assert config['task'] == model_config['task']
 
     device = torch.device("cuda:0" if torch.cuda.is_available() else "cpu")
 
