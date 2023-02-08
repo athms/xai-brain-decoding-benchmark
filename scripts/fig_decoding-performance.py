@@ -216,7 +216,7 @@ def fig_decoding_performance(config: Dict=None) -> None:
             model_path = os.path.join(
                 model_dir,
                 f'run-{fitting_run}',
-                'final_model.pt'
+                'best_model.pt'
             )
 
             if not torch.cuda.is_available():
