@@ -289,9 +289,9 @@ def fig_decoding_performance(config: Dict=None) -> None:
             f'Min: {np.min(acc):.1f}%\n'+\
             f'Max: {np.max(acc):.1f}%',
             horizontalalignment='center',
-            verticalalignment='top',
+            verticalalignment='center',
             transform=axs[2].transAxes,
-            size=8,
+            size=7,
             color='k'
         )
 
