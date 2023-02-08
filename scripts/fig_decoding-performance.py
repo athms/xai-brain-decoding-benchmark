@@ -300,7 +300,7 @@ def fig_decoding_performance(config: Dict=None) -> None:
 
         # plot average confusion matrix:
         sns.heatmap(
-            conf_mat.astype(int),
+            np.floor(conf_mat), # we are conservative and rounding down
             vmax=100,
             vmin=0,
             center=50,
