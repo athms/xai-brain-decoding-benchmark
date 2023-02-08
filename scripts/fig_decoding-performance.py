@@ -180,7 +180,7 @@ def fig_decoding_performance(config: Dict=None) -> None:
                     history_run['accuracy']*100,
                     color='gray',
                     alpha=0.5,
-                    lw=0.5,
+                    lw=1,
                 )
                 if history_run['epoch'].max() > max_epoch:
                     max_epoch = history_run['epoch'].max()
@@ -296,7 +296,7 @@ def fig_decoding_performance(config: Dict=None) -> None:
         )
 
         if task_i == 0:
-            axs[3].set_title('Test confusion (%)')
+            axs[3].set_title('Test\nconfusion (%)')
 
         # plot average confusion matrix:
         sns.heatmap(
@@ -335,7 +335,7 @@ def fig_decoding_performance(config: Dict=None) -> None:
 
     for label in list('ABCDEFGHIJKL'):
         fig_axs[label].text(
-            -0.25,
+            -0.2,
             1.2,
             label,
             transform=fig_axs[label].transAxes,
