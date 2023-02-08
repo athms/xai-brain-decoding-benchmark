@@ -291,7 +291,7 @@ def fig_decoding_performance(config: Dict=None) -> None:
             horizontalalignment='center',
             verticalalignment='center',
             transform=axs[2].transAxes,
-            size=7,
+            size=8,
             color='k'
         )
 
@@ -336,7 +336,7 @@ def fig_decoding_performance(config: Dict=None) -> None:
     for label in list('ABCDEFGHIJKL'):
         fig_axs[label].text(
             -0.2,
-            1.2,
+            1.25,
             label,
             transform=fig_axs[label].transAxes,
             fontsize=12,
