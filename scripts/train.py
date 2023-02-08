@@ -522,7 +522,7 @@ def train_run(
         earl_stopping(metric=np.mean(eval_losses), epoch=epoch)
         if earl_stopping.early_stop:
             print(
-                'Stopping training as early-stopping criterion reached.'
+                '\tStopping training as early-stopping criterion reached.'
             )
             break
 
