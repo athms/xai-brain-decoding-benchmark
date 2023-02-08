@@ -69,13 +69,12 @@ def interpret(config: Dict=None) -> None:
         
         def __call__(self, model):
             return NoiseTunnel(Saliency(model))
-    
     SmoothGrad = SmoothGradDummy()
-        
+    
     with open(
         os.path.join(
-            config["fitted_model_dir"],
-            'trial_image_paths.json'
+            config["data_dir"],
+            'train_test_split.json'
             ),
         'r'
         ) as f:
@@ -118,7 +117,7 @@ def interpret(config: Dict=None) -> None:
         model_path = os.path.join(
             config["fitted_model_dir"],
             f'run-{run}',
-            'final_model.pt'
+            'best_model.pt'
         )
         attribution_methods = [
             DeepLift,
@@ -152,7 +151,6 @@ def interpret(config: Dict=None) -> None:
                 )
 
             else:
-
                 if not torch.cuda.is_available():
                     model.load_state_dict(
                         torch.load(
@@ -160,7 +158,6 @@ def interpret(config: Dict=None) -> None:
                             map_location=torch.device('cpu')
                         )
                     )
-
                 else:
                     model.load_state_dict(torch.load(model_path))
             
@@ -353,7 +350,7 @@ def attribute_argsparse() -> argparse.ArgumentParser:
              'is to be interpreted are stored.'
              '(as resulting from running scripts/train.py)'
              'If multiple fitting runs exist for the model, '
-             'the decoding decisions of the final model of each run'
+             'the decoding decisions of the best model of each run'
              'are interpreted for the test data of the given task'
     )
     parser.add_argument(
@@ -392,6 +389,6 @@ def attribute_argsparse() -> argparse.ArgumentParser:
     )
     return parser
 
-if __name__ == '__main__':
-    
+
+if __name__ == '__main__':    
     interpret()
