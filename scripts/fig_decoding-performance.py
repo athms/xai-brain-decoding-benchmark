@@ -175,7 +175,7 @@ def fig_decoding_performance(config: Dict=None) -> None:
             for run in history['run'].unique():
                 history_run = history[history['run']==run].copy()
                 axs[history_i].plot(
-                    history_run['epochs'],
+                    history_run['epoch'],
                     history_run['accuracy'],
                     color='gray',
                     alpha=0.75,
