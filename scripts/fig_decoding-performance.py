@@ -135,15 +135,14 @@ def fig_decoding_performance(config: Dict=None) -> None:
             axs[1].set_title('Validation')
 
         axs[0].set_ylabel(f'{task}\n\nAccuracy (%)')
-        axs[1].set_ylabel('Accuracy (%)')
         axs[0].axhline(
-            y=chance_acc,
+            y=chance_acc * 100,
             color='gray',
             linewidth=1,
             ls='--'
         )
         axs[1].axhline(
-            y=chance_acc,
+            y=chance_acc * 100,
             color='gray',
             linewidth=1,
             ls='--'
@@ -172,30 +171,41 @@ def fig_decoding_performance(config: Dict=None) -> None:
                 [train_history, val_history]
             )
         ):
-            history_grouped = history.groupby(['run', 'epoch']).accuracy.mean().groupby('epoch')
-            history_min = history_grouped.min() * 100
-            history_max = history_grouped.max() * 100
-            history_mean = history_grouped.mean() * 100
-            axs[history_i].plot(
-                history_mean,
-                color=sns.color_palette('Set3')[-(history_i+1)],
-                zorder=history_i,
-                lw=2,
-            )
-            epochs = np.sort(history['epoch'].unique())
-            axs[history_i].fill_between(
-                epochs,
-                history_min,
-                history_max,
-                alpha=0.5,
-                color=sns.color_palette('Set3')[-(history_i+1)],
-                zorder=history_i,
-                linewidth=0.0
-            )
+            for run in history['run'].unique():
+                history_run = history[history['run']==run].copy()
+                axs[history_i].plot(
+                    history_run['epochs'],
+                    history_run['accuracy'],
+                    color='gray',
+                    alpha=0.75,
+                    lw=1,
+                )
+            # history_grouped = history.groupby(['run', 'epoch']).accuracy.mean().groupby('epoch')
+            # history_min = history_grouped.min() * 100
+            # history_max = history_grouped.max() * 100
+            # history_mean = history_grouped.mean() * 100
+            # epochs = np.sort(history['epoch'].unique())
+            # axs[history_i].plot(
+            #     epochs,
+            #     history_mean,
+            #     color='gray',
+            #     zorder=history_i,
+            #     lw=1,
+            # )
+            # axs[history_i].fill_between(
+            #     epochs,
+            #     history_min,
+            #     history_max,
+            #     alpha=0.3,
+            #     color='gray',
+            #     zorder=history_i,
+            #     linewidth=0.0
+            # )
             axs[history_i].set_ylim(0, 100)
-            axs[history_i].set_xlim(0, np.max(epochs))
-            axs[history_i].set_xticks(epochs[::5])
-            axs[history_i].set_xticklabels([e if e%10==0 else '' for e in epochs[::5]])
+            axs[history_i].set_xlim(0, 40)
+            epochs = np.arange(1, 100)
+            axs[history_i].set_xticks(epochs[::10])
+            axs[history_i].set_xticklabels([e if e%20==0 else '' for e in epochs[::10]])
 
         # compute average confusion matrix and final decoding accuracies:
         conf_mat = np.zeros((num_labels, num_labels))
@@ -261,23 +271,24 @@ def fig_decoding_performance(config: Dict=None) -> None:
             y=np.array(acc),
             ax=axs[2],
             alpha=0.7,
-            color=sns.color_palette('Set3')[-3],
+            color='gray',
+            edgecolor='gray',
+            linewidth=0.5
         )
         axs[2].set_ylim(0, 100)
-        axs[2].set_ylabel('Accuracy (%)')
         axs[2].set_xticks([0])
         axs[2].set_xticklabels(['Final epoch'])
         axs[2].text(
             0.5,
             0.25,
-            f'mean: {np.mean(acc):.1f}%\n'+\
-            f'min: {np.min(acc):.1f}%\n'+\
-            f'max: {np.max(acc):.1f}%',
+            f'Mean: {np.mean(acc):.1f}%\n'+\
+            f'Min: {np.min(acc):.1f}%\n'+\
+            f'Max: {np.max(acc):.1f}%',
             horizontalalignment='center',
             verticalalignment='center',
             transform=axs[2].transAxes,
             size=8,
-            color=sns.color_palette('Set3')[-3]
+            color='k'
         )
 
         if task_i == 0:
@@ -298,7 +309,7 @@ def fig_decoding_performance(config: Dict=None) -> None:
             },
             ax=axs[3],
         )
-        axs[3].set_ylabel('True')
+        axs[3].set_ylabel('True state')
         yticklabels = [
             k if k!='rejection' else 'reject.'
             for k in target_labeling[task].keys()
@@ -316,12 +327,12 @@ def fig_decoding_performance(config: Dict=None) -> None:
         )
 
         if task_i == 2:
-            axs[3].set_xlabel('Predicted')
+            axs[3].set_xlabel('Predicted state')
 
     for label in list('ABCDEFGHIJKL'):
         fig_axs[label].text(
-            -0.25,
-            1.25,
+            -0.2,
+            1.2,
             label,
             transform=fig_axs[label].transAxes,
             fontsize=12,
