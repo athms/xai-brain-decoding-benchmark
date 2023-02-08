@@ -253,7 +253,7 @@ class EarlyStopping:
         min_delta: float=0.02,
         plateau_std: float=0.01,
         plateau_n: float=10,
-        grace_period: int=20,
+        grace_period: int=10,
         mode='min'
         ) -> None:
 
@@ -697,7 +697,7 @@ def get_train_argparse(parser: argparse.ArgumentParser=None) -> argparse.Argumen
     parser.add_argument(
       '--stopping-grace',
       metavar='INT',
-      default=20,
+      default=10,
       type=int,
       required=False,
       help='minimum number of training epochs before training can be stopped '
