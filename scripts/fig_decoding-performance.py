@@ -207,7 +207,7 @@ def fig_decoding_performance(config: Dict=None) -> None:
             # )
             axs[history_i].set_ylim(0, 100)
             axs[history_i].set_xlim(0, max_epoch)
-            epochs = np.arange(0, max_epoch+10, 10)
+            epochs = np.arange(0, max_epoch+5, 5) if max_epoch<31 else np.arange(0, max_epoch+10, 10)
             axs[history_i].set_xticks(epochs)
             axs[history_i].set_xticklabels(epochs)
 
@@ -289,7 +289,7 @@ def fig_decoding_performance(config: Dict=None) -> None:
             f'Min: {np.min(acc):.1f}%\n'+\
             f'Max: {np.max(acc):.1f}%',
             horizontalalignment='center',
-            verticalalignment='center',
+            verticalalignment='top',
             transform=axs[2].transAxes,
             size=8,
             color='k'
