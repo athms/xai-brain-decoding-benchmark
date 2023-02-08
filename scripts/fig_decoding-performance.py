@@ -207,7 +207,7 @@ def fig_decoding_performance(config: Dict=None) -> None:
             # )
             axs[history_i].set_ylim(0, 100)
             axs[history_i].set_xlim(0, max_epoch)
-            epochs = np.arange(1, max_epoch+20, 20)
+            epochs = np.arange(0, max_epoch+10, 10)
             axs[history_i].set_xticks(epochs)
             axs[history_i].set_xticklabels(epochs)
 
