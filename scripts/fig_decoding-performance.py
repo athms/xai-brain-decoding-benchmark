@@ -300,13 +300,13 @@ def fig_decoding_performance(config: Dict=None) -> None:
 
         # plot average confusion matrix:
         sns.heatmap(
-            np.floor(conf_mat), # we are conservative and rounding down
+            conf_mat.astype(int), # we are conservative and rounding down
             vmax=100,
             vmin=0,
             center=50,
             square=True,
             annot=True,
-            annot_kws={'size': 8, 'fontstretch': 50},
+            annot_kws={'size': 8},
             linewidths=.5,
             cbar_kws={
                 "shrink": .5,
