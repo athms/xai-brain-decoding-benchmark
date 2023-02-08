@@ -76,8 +76,9 @@ def fig_decoding_performance(config: Dict=None) -> None:
 
         with open(
             os.path.join(
-                model_dir,
-                'trial_image_paths.json'
+                config['data_base_dir'],
+                f'task-{task}',
+                'train_test_split.json'
                 ),
             'r'
         ) as f:
