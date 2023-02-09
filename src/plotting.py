@@ -64,7 +64,7 @@ def _save_surfaces_to_workdir(
             q=threshold_percentile
         )
 
-    plt.rcParams['axes.facecolor'] = 'black'
+    plt.rcParams['axes.facecolor'] = 'white'
     image_paths = []
 
     for view, hemi in zip(
@@ -113,7 +113,7 @@ def _save_surfaces_to_workdir(
                 )
             ),
             dpi=dpi,
-            facecolor='black',
+            facecolor='white',
             edgecolor='none'
         )
         image_paths.append(
@@ -153,7 +153,7 @@ def _save_colorbar_to_workdir(
     )
     cbar.ax.tick_params(
         labelsize=45,
-        colors='white',
+        colors='black',
         width=0
     )
     ax.remove()
@@ -164,7 +164,7 @@ def _save_colorbar_to_workdir(
             'colorbar.png'
         ),
         dpi=dpi,
-        facecolor='black',
+        facecolor='white',
         edgecolor='none'
     )
     return os.path.join(
@@ -261,7 +261,7 @@ def plot_brain_img(
     background_img = Image.new(
         mode='RGBA',
         size=(int(background_w), int(background_h)),
-        color="BLACK"
+        color="WHITE"
     )
         
     for i, img in enumerate(image_paths):
