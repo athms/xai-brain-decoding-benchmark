@@ -21,6 +21,8 @@ def compute_group_level_BOLD_glm_maps(config=None) -> None:
     if config is None:
         config = vars(get_argparse().parse_args())
 
+    np.random.seed(config['seed'])
+
     glm_data = gather_glm_data(config['subject_level_maps_dir'])
     glm_data = glm_data[glm_data['label'].isin(target_labeling[config['task']])].copy()
     os.makedirs(config['group_level_maps_dir'], exist_ok=True)
@@ -201,6 +203,14 @@ def get_argparse() -> argparse.ArgumentParser:
         required=False,
         help='path where group-level BOLD GLM maps are stored'
              '(default: results/glm/BOLD/task-WM/group_level)'
+    )
+    parser.add_argument(
+        '--seed',
+        metavar='INT',
+        default=12345,
+        type=int,
+        required=False,
+        help='random seed (default: 12345)'
     )
 
     return parser

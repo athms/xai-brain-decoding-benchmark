@@ -23,6 +23,8 @@ def compute_subject_level_attribution_glm_maps(config=None) -> None:
         config = vars(get_argparse().parse_args())
         config['plot_stat_maps'] = config['plot_stat_maps'] == 'True'
 
+    np.random.seed(config['seed'])
+
     attribution_methods = [
         p for p in os.listdir(config['attributions_dir'])
         if os.path.isdir(os.path.join(config['attributions_dir'], p))
@@ -270,11 +272,11 @@ def get_argparse() -> argparse.ArgumentParser:
     parser.add_argument(
         '--subject-level-maps-dir',
         metavar='DIR',
-        default='results/glm/attributions/task-WM/subject_level',
+        default='results/glm/attributions/task-WM/subject',
         type=str,
         required=False,
         help='directory where subject-level GLM maps are stored '
-             '(default: results/glm/attributions/task-WM/subject_level)'
+             '(default: results/glm/attributions/task-WM/subject)'
     )
     parser.add_argument(
         '--plot-stat-maps',
@@ -285,6 +287,14 @@ def get_argparse() -> argparse.ArgumentParser:
         required=False,
         help='whether or not to plot individual subject-level maps '
              '(default: False)'
+    )
+    parser.add_argument(
+        '--seed',
+        metavar='INT',
+        default=12345,
+        type=int,
+        required=False,
+        help='random seed (default: 12345)'
     )
 
     return parser

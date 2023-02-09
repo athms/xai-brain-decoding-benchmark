@@ -21,6 +21,8 @@ def compute_subject_level_BOLD_glm_maps(config=None) -> None:
         config = vars(get_argparse().parse_args())
         config['plot_stat_maps'] = config['plot_stat_maps'] == 'True'
 
+    np.random.seed(config['seed'])
+
     task = config['task']
     print(
         f'\nprocessing task: {task}'
@@ -240,6 +242,14 @@ def get_argparse() -> argparse.ArgumentParser:
         required=False,
         help='whether or not to plot subject-level BOLD GLM maps'
              '(default: False)'
+    )
+    parser.add_argument(
+        '--seed',
+        metavar='INT',
+        default=12345,
+        type=int,
+        required=False,
+        help='random seed (default: 12345)'
     )
 
     return parser
