@@ -227,11 +227,11 @@ def get_argparse() -> argparse.ArgumentParser:
     parser.add_argument(
         '--subject-level-maps-dir',
         metavar='DIR',
-        default='results/glm/BOLD/task-WM/subject_level',
+        default='results/glm/BOLD/task-WM/subject',
         type=str,
         required=False,
         help='path where subject-level BOLD GLM maps are stored '
-             '(default: results/glm/BOLD/task-WM/subject_level)'
+             '(default: results/glm/BOLD/task-WM/subject)'
     )
     parser.add_argument(
         '--plot-stat-maps',
