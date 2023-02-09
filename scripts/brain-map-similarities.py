@@ -6,11 +6,12 @@ import pandas as pd
 from scipy.stats import pearsonr
 from sklearn.feature_selection import mutual_info_regression
 from nilearn.masking import compute_background_mask, apply_mask
+from nilearn.image import resample_to_img
 
 
 def compute_brain_map_similarities(config=None) -> None:
-    """Script's main function; computes similarity of BOLD and attribution 
-    GLM maps (as measured by mutual information)."""
+    """Script's main function; computes similarity of attribution GLM maps
+    with BOLD GLM maps and meta analysis maps."""
     
     if config is None:
         config = vars(get_argparse().parse_args())
@@ -21,17 +22,18 @@ def compute_brain_map_similarities(config=None) -> None:
         ),
         exist_ok=True
     )
+
     print(
         '\nComputing similarity of group-level BOLD GLM maps and ...'
     )
+
     for analysis_level in ['group', 'subject']:
         print(
             f'... {analysis_level}-level attribution GLM maps'
         )
-
         attribution_maps_dir = os.path.join(
             config["attribution_glm_maps_dir"],
-            f'{analysis_level}_level',
+            f'{analysis_level}',
         )
         attribution_methods = [
             p for p in os.listdir(attribution_maps_dir)
@@ -57,11 +59,22 @@ def compute_brain_map_similarities(config=None) -> None:
                         if p.endswith('.nii.gz')
                     }
                     for image in attribution_image_paths:
+                        
+                        meta_image = f"{image.split('_')[0]}_meta_map.nii.gz"
+                        if image.startswith('lh') or image.startswith('rh'):
+                            meta_image = 'h_meta_map.nii.gz'
+                        if image.startswith('lf') or image.startswith('rf'):
+                            meta_image = 'f_meta_map.nii.gz'
+
                         yield (
                             os.path.join(
                                 config["bold_glm_maps_dir"],
-                                'group_level',
+                                'group',
                                 image
+                            ),
+                            os.path.join(
+                                config["meta_maps_dir"],
+                                meta_image
                             ),
                             os.path.join(
                                 base_path,
@@ -82,6 +95,7 @@ def compute_brain_map_similarities(config=None) -> None:
                         if p.startswith('sub_')
                     }
                     for subject in subjects:
+                        
                         attribution_image_paths = {
                             p for p in os.listdir(
                                 os.path.join(
@@ -91,12 +105,24 @@ def compute_brain_map_similarities(config=None) -> None:
                             )
                             if p.endswith('.nii.gz')
                         }
+
                         for image in attribution_image_paths:
+                            
+                            meta_image = f"{image.split('_')[0]}_meta_map.nii.gz"
+                            if image.startswith('lh') or image.startswith('rh'):
+                                meta_image = 'h_meta_map.nii.gz'
+                            if image.startswith('lf') or image.startswith('rf'):
+                                meta_image = 'f_meta_map.nii.gz'
+                            
                             yield (
                                 os.path.join(
                                     config["bold_glm_maps_dir"],
-                                    'group_level',
+                                    'group',
                                     image
+                                ),
+                                os.path.join(
+                                    config["meta_maps_dir"],
+                                    meta_image
                                 ),
                                 os.path.join(
                                     attribution_maps_dir,
@@ -111,26 +137,42 @@ def compute_brain_map_similarities(config=None) -> None:
                     f'Unknown analysis level: {analysis_level}'
                 )
 
-            
-            for bold_image_path, attribution_image_path in yield_image_paths():
+            for bold_image_path, meta_image_path, attribution_image_path in yield_image_paths():
+                
                 mask_img = compute_background_mask(bold_image_path)
-                mi = mutual_info_regression(
-                    X=apply_mask(attribution_image_path, mask_img).reshape(-1,1),
-                    y=apply_mask(bold_image_path, mask_img),
+                attribution_masked = apply_mask(attribution_image_path, mask_img)
+                bold_masked = apply_mask(bold_image_path, mask_img)
+                # resample meta analysis image to subject bold
+                meta_resampled = resample_to_img(meta_image_path, bold_image_path)
+                meta_masked = apply_mask(meta_resampled, mask_img)
+                
+                # mutual information
+                mi_bold = mutual_info_regression(
+                    X=attribution_masked.reshape(-1,1),
+                    y=bold_masked,
                     discrete_features=False
                 )
-                r, p = pearsonr(
-                    apply_mask(attribution_image_path, mask_img).reshape(-1,1),
-                    apply_mask(bold_image_path, mask_img)
+                mi_meta = mutual_info_regression(
+                    X=attribution_masked.reshape(-1,1),
+                    y=meta_masked,
+                    discrete_features=False
                 )
+                
+                # pearson correlation
+                r_bold, _ = pearsonr(attribution_masked, bold_masked)
+                r_meta, _ = pearsonr(attribution_masked, meta_masked)
+                
                 brain_map_similarities.append(
                     pd.DataFrame(
                         data={
                             'method': attribution_method,
-                            'mi': mi,
-                            'r': r,
+                            'mi_bold': mi_bold,
+                            'r_bold': r_bold,
+                            'mi_meta': mi_meta,
+                            'r_meta': r_meta,
                             'bold_image': bold_image_path,
                             'attribution_image': attribution_image_path,
+                            'meta_image': meta_image_path,
                             'contrast': bold_image_path.split('/')[-1].split('_')[0]
                         },
                         index=[brain_map_similarities_i]               
@@ -178,6 +220,15 @@ def get_argparse() -> argparse.ArgumentParser:
         required=False,
         help='directory where attribution GLM maps are stored '
              '(default: results/glm/attributions/task-WM)'
+    )
+    parser.add_argument(
+        '--meta-maps-dir',
+        metavar='DIR',
+        default='results/meta_analysis/task-WM',
+        type=str,
+        required=False,
+        help='directory where meta analysis maps are stored '
+             '(default: results/meta_analysis/task-WM)'
     )
     parser.add_argument(
         '--attributions-dir',
