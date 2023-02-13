@@ -22,7 +22,9 @@ sns.set_theme(
 
 
 def fig_attribution_variance(config: Dict=None) -> None:
-    """Script's main function; xxx.
+    """Script's main function; computes variance across
+    attributions and correlates mean variance with
+    decoding accuracy.
     """
 
     if config is None:
@@ -115,7 +117,7 @@ def fig_attribution_variance(config: Dict=None) -> None:
             dropout=model_config["dropout"]
         )
 
-        # compute test accuracies:
+        # compute decoding accuracies:
         df_i, df_acc = 0, []
         for fitting_run in fitting_runs:
             model_path = os.path.join(
@@ -230,17 +232,6 @@ def fig_attribution_variance(config: Dict=None) -> None:
         )
         print('..done.')
         
-    # for label in list('ABCDEFGHIJKLMNOPQRST'):
-    #     fig_axs[label].text(
-    #         -0.2,
-    #         1.25,
-    #         label,
-    #         transform=fig_axs[label].transAxes,
-    #         fontsize=12,
-    #         fontweight='bold',
-    #         va='top'
-    #     )
-    
 
 def get_argparse(parser: argparse.ArgumentParser=None) -> argparse.ArgumentParser:
     
