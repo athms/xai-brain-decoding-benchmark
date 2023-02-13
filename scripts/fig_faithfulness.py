@@ -4,6 +4,8 @@ import os
 import argparse
 import numpy as np
 import pandas as pd
+import bambi as bmb
+import arviz as az
 from sqlite3 import DataError
 import matplotlib.pyplot as plt
 from matplotlib.lines import Line2D
@@ -14,12 +16,19 @@ sns.set_theme(
 )
 
 
+def test_hdi(hdi: np.ndarray, true_value: float = 0) -> bool:
+    """Test whether true value is in HDI"""
+    return hdi[0] <= true_value <= hdi[1]
+
+
 def fig_faithfulness(config=None) -> None:
     """Script's main function; creates overview
     figure for faithfulness analysis (scripts/faithfulness_analysis.py)."""
 
     if config is None:
         config = vars(get_argparse().parse_args())
+
+    np.random.seed(config['seed'])
 
     fig, fig_axs = plt.subplot_mosaic(
         """
@@ -35,8 +44,8 @@ def fig_faithfulness(config=None) -> None:
         'DeepLiftShap',
         'IntegratedGradients',
         'LRP',
-        'Gradient',
         'InputXGradient',
+        'Gradient',
         'SmoothGrad',
         'GuidedBackprop',
         'GuidedGradCam',
@@ -73,6 +82,8 @@ def fig_faithfulness(config=None) -> None:
 
         faithfulness = pd.read_csv(faithfulness_path)
         chance_first_reached = pd.read_csv(chance_first_reached_path)
+        chance_first_reached['task'] = task
+        # mfx_data.append(chance_first_reached)
         fractions = np.sort(np.unique(faithfulness['fraction_occluded']))
         axs[0].axhline(
             y=chance_first_reached['chance'].mean(),
@@ -111,7 +122,7 @@ def fig_faithfulness(config=None) -> None:
 
         axs[0].set_xticks(fractions)
         axs[0].set_xticklabels([int(i) if i%1==0 else '' for i in fractions])
-        axs[0].set_xlim(0, np.round(fractions.max()))
+        axs[0].set_xlim(0, 40)
         axs[0].set_ylabel(f'{task}\n\nTest accuracy (%)')
 
         if task_i == 1:
@@ -133,24 +144,13 @@ def fig_faithfulness(config=None) -> None:
             hue='method',
             order=method_ordering,
             hue_order=method_ordering,
+            alpha=0.75,
+            edgecolor='gray',
+            linewidth=0.5,
             ax=axs[1],
             palette=plotting_colors,
             size=4,
-            alpha=0.5,
             zorder=-1
-        )
-        sns.pointplot(
-            data=chance_first_reached,
-            x="method",
-            y="fraction_occluded",
-            hue='method',
-            order=method_ordering,
-            ax=axs[1],
-            color='black',
-            size=3,
-            markers='x',
-            ci=None,
-            zorder=99
         )
         axs[1].legend_.remove()
 
@@ -160,7 +160,7 @@ def fig_faithfulness(config=None) -> None:
         else:
             axs[1].set_title('')
 
-        axs[1].set_ylim(0, max(fractions))
+        axs[1].set_ylim(0, None)
         axs[1].set_ylabel('Occlusion (%)')
         axs[1].set_xlabel('')
 
@@ -174,6 +174,79 @@ def fig_faithfulness(config=None) -> None:
 
         else:
             axs[1].set_xticklabels([])
+
+        # compute mixed effects model
+        mfx_results_path = os.path.join(
+            config["mfx_dir"],
+            f'faithfulness-{task}_mfx-results.csv'
+        )
+        if not os.path.isfile(mfx_results_path):
+            chance_first_reached = chance_first_reached[chance_first_reached['method'].isin(method_ordering)]
+            chance_first_reached = pd.get_dummies(chance_first_reached, columns=['method'])
+            colname_mapper = {
+                c: c.split('method_')[1]
+                for c in chance_first_reached.columns
+                if 'method' in c
+            }
+            chance_first_reached.rename(columns=colname_mapper, inplace=True)
+            chance_first_reached['DeepLift'] = 0
+            fixed_effects = " + ".join([m for m in method_ordering if m!='DeepLift']) # DeepLift is the reference method
+            model_string = f"fraction_occluded ~ {fixed_effects}"
+            print(
+                f'\nComputing regression model:\n\t{model_string}\n'
+            )
+            mfx_model = bmb.Model(model_string, chance_first_reached)
+
+            n_tune = 5000
+            converged = False
+            while not converged:
+                results = mfx_model.fit(
+                    draws=5000,
+                    tune=n_tune,
+                    chains=4,
+                    random_seed=config['seed']
+                )
+                mfx_result = az.summary(results)
+
+                if all(np.abs(mfx_result['r_hat']-1) < .05):
+                    converged = True
+                
+                n_tune += 5000
+
+            az.plot_trace(results);
+            plt.tight_layout()
+            os.makedirs(
+                config["mfx_dir"],
+                exist_ok=True
+            )
+            plt.savefig(
+                fname=os.path.join(
+                    config["mfx_dir"],
+                    f'faithfulness-{task}_mfx-trace.png'
+                ),
+                dpi=300
+            )
+            mfx_result.to_csv(mfx_results_path)
+
+        else:
+            mfx_result = pd.read_csv(mfx_results_path, index_col=0)
+
+        # plot indicator for meaningful differences
+        for mi, method in enumerate(method_ordering):
+
+            if method != 'DeepLift':
+            
+                if not test_hdi(mfx_result.loc[method, ['hdi_3%','hdi_97%']]):
+                    axs[1].text(
+                        s='*',
+                        x=mi,
+                        y=float(axs[1].get_ylim()[1])*0.9,
+                        ha='center',
+                        va='bottom',
+                        fontsize=20
+                    )
+
+        axs[1].set_ylim(0,  float(axs[1].get_ylim()[1])*1.15)
 
         _ = [sns.despine(ax=ax) for ax in axs]
 
@@ -201,6 +274,8 @@ def fig_faithfulness(config=None) -> None:
         dpi=300
     )
 
+    return fig
+
 
 def get_argparse() -> argparse.ArgumentParser:
 
@@ -225,10 +300,26 @@ def get_argparse() -> argparse.ArgumentParser:
         required=False,
         help='path where figures are stored (default: figures)'
     )
+    parser.add_argument(
+        '--mfx-dir',
+        metavar='DIR',
+        default='results/mfx',
+        type=str,
+        required=False,
+        help='path where results of mixed effects analysis are stored '
+             '(default: results/mfx)'
+    )
+    parser.add_argument(
+        "--seed",
+        type=str,
+        metavar='INT',
+        default=12345,
+        help='random seed'
+    )
 
     return parser
 
 
 if __name__ == '__main__':
     
-    fig_faithfulness()
+    fig_faithfulness();
