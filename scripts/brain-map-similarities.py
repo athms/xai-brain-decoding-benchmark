@@ -2,8 +2,8 @@
 
 import os
 import argparse
+import numpy as np
 import pandas as pd
-from scipy.stats import pearsonr
 from sklearn.feature_selection import mutual_info_regression
 from nilearn.masking import compute_background_mask, apply_mask
 from nilearn.image import resample_to_img
@@ -139,29 +139,15 @@ def compute_brain_map_similarities(config=None) -> None:
 
             for bold_image_path, meta_image_path, attribution_image_path in yield_image_paths():
                 
-                mask_img = compute_background_mask(bold_image_path)
-                attribution_masked = apply_mask(attribution_image_path, mask_img)
-                bold_masked = apply_mask(bold_image_path, mask_img)
-                # resample meta analysis image to subject bold
-                meta_resampled = resample_to_img(meta_image_path, bold_image_path)
-                meta_masked = apply_mask(meta_resampled, mask_img)
-                
-                # mutual information
-                mi_bold = mutual_info_regression(
-                    X=attribution_masked.reshape(-1,1),
-                    y=bold_masked,
-                    discrete_features=False
+                (
+                    (mi_bold, mi_meta),
+                    (r_bold, r_meta)
+                ) = compute_similarity_metrics(
+                    attribution_image=attribution_image_path,
+                    bold_image=bold_image_path,
+                    meta_image=meta_image_path
                 )
-                mi_meta = mutual_info_regression(
-                    X=attribution_masked.reshape(-1,1),
-                    y=meta_masked,
-                    discrete_features=False
-                )
-                
-                # pearson correlation
-                r_bold, _ = pearsonr(attribution_masked, bold_masked)
-                r_meta, _ = pearsonr(attribution_masked, meta_masked)
-                
+
                 brain_map_similarities.append(
                     pd.DataFrame(
                         data={
@@ -188,6 +174,44 @@ def compute_brain_map_similarities(config=None) -> None:
                 )
 
             print('Done!')
+
+
+def compute_similarity_metrics(attribution_image, bold_image, meta_image):
+    """helper function to compute mutual inforiation and pearson correlation,
+    between attribution image and {bold, meta} images
+    
+    Args:
+    ---
+    {attribution,bold,meta}_image : str or nii image
+        images or path to images for attribution, bold, and meta-analysis
+        images
+    
+    Returns:
+    ---
+    (mi_bold, mi_meta), (r_bold, r_meta)
+    """
+    # reduce data to brain
+    mask_img = compute_background_mask(bold_image)
+    attribution_masked = apply_mask(attribution_image, mask_img)
+    bold_masked = apply_mask(bold_image, mask_img)
+    # resample meta analysis image to subject bold
+    meta_resampled = resample_to_img(meta_image, bold_image)
+    meta_masked = apply_mask(meta_resampled, mask_img)
+    # mutual information
+    mi_bold = mutual_info_regression(
+        X=attribution_masked.reshape(-1,1),
+        y=bold_masked,
+        discrete_features=False
+    )
+    mi_meta = mutual_info_regression(
+        X=attribution_masked.reshape(-1,1),
+        y=meta_masked,
+        discrete_features=False
+    )
+    # pearson correlation
+    r_bold, _ = pearsonr(attribution_masked, bold_masked)
+    r_meta, _ = pearsonr(attribution_masked, meta_masked)
+    return (mi_bold, mi_meta), (r_bold, r_meta)
 
 
 def get_argparse() -> argparse.ArgumentParser:
@@ -252,5 +276,4 @@ def get_argparse() -> argparse.ArgumentParser:
 
 
 if __name__ == '__main__':
-    
     compute_brain_map_similarities()
