@@ -114,7 +114,7 @@ def sfig_brain_maps_similarity(config=None) -> None:
                     ['method', 'subject'])['r'].mean().reset_index()
                 subject_means['task'] = task
                 mfx_data.append(subject_means)
-                ax = sns.violinplot(
+                ax = sns.swarmplot(
                     data=subject_means,
                     x="method",
                     y='r',
@@ -125,7 +125,6 @@ def sfig_brain_maps_similarity(config=None) -> None:
                     edgecolor='gray',
                     linewidth=0.5,
                     palette=sns.color_palette("Paired"),
-                    scale_hue=True,
                 )
 
                 # compute mixed effects model
@@ -204,11 +203,11 @@ def sfig_brain_maps_similarity(config=None) -> None:
             
             ax.set_xlabel('')
             if analysis_level == 'group':
-                ylabel = 'r('+r'$Attr_{Group}; Ref$'+')'
+                ylabel = 'r('+r'$Attr_{Group}; BOLD_{Group}$'+')'
                 ax.set_ylim(-.2, None)
             
             elif analysis_level == 'subject':
-                ylabel = 'r('+r'$Attr_{Ind}; Ref$'+')'
+                ylabel = 'r('+r'$Attr_{Ind}; BOLD_{Group}$'+')'
             
             else:
                 raise ValueError(
