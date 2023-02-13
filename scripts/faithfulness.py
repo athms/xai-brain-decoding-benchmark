@@ -21,10 +21,11 @@ def faithfulness_analysis(config: Dict=None) -> None:
     """Script's main function; computes faithfulness analysis
     for attributions / fitted model of given task."""
 
-    np.random.seed(1234)
-
     if config is None:
         config = vars(get_argparse().parse_args())
+
+    np.random.seed(config['seed'])
+    torch.manual_seed(config["seed"])
 
     device = torch.device("cuda:0" if torch.cuda.is_available() else "cpu")
     
@@ -40,7 +41,7 @@ def faithfulness_analysis(config: Dict=None) -> None:
         config["faithfulness_dir"],
         'faithfulness_analysis.csv'
     )
-    # file that stores occlusion rate at which 
+    # to store occlusion rate at which 
     # decoding performance reaches chance level first
     chance_first_reached_path = os.path.join(
         config["faithfulness_dir"],
@@ -53,8 +54,8 @@ def faithfulness_analysis(config: Dict=None) -> None:
 
     with open(
         os.path.join(
-            config["fitted_model_dir"],
-            'trial_image_paths.json'
+            config["data_dir"],
+            'train_test_split.json'
             ),
         'r'
         ) as f:
@@ -73,6 +74,7 @@ def faithfulness_analysis(config: Dict=None) -> None:
         subjects=test_subjects,
         decoding_targets=target_labeling[config["task"]].keys()
     )
+
     test_data = {
         'image_path': [],
         'label': [],
@@ -80,9 +82,7 @@ def faithfulness_analysis(config: Dict=None) -> None:
         'image': [],
         'nii_image': []
     }
-
     for subject in test_image_paths:
-        
         for image_path in test_image_paths[subject]:
             label = image_path.split('/')[-1].split('_')[0]
             nii_image = load_img(image_path)
@@ -96,7 +96,10 @@ def faithfulness_analysis(config: Dict=None) -> None:
     input_shape = image.shape[1:]
     num_labels = len(target_labeling[config["task"]])
 
-    model_config = json.load(open(os.path.join(config['fitted_model_dir'], 'config.json')))
+    model_config = json.load(open(
+        os.path.join(config['fitted_model_dir'], 'config.json')
+        )
+    )
     model = CNNModel(
         input_shape=input_shape,
         num_classes=num_labels,
@@ -143,16 +146,14 @@ def faithfulness_analysis(config: Dict=None) -> None:
         np.arange(0, 2, 0.2),
         np.arange(2, 5, 0.5),
         np.arange(5, 10, 1),
-        np.arange(10, 32, 2)
+        np.arange(10, 30, 2),
+        np.arange(30, 55, 5)
     ]
     fractions = np.concatenate(fractions)
     fractions = np.round(fractions, 1)
     fraction_start = 0
-    faithfulness = []
-    chance_first_reached = []
-    faithfulness_i = 0
-    chance_first_reached_i = 0
-
+    faithfulness, faithfulness_i = [], 0
+    chance_first_reached, chance_first_reached_i = [], 0
     for fitting_run in fitting_runs:
         print(
             f'\nProcessing data for fitting run-{fitting_run}'
@@ -160,7 +161,7 @@ def faithfulness_analysis(config: Dict=None) -> None:
         model_path = os.path.join(
             config["fitted_model_dir"],
             f'run-{fitting_run}',
-            'final_model.pt'
+            'best_model.pt'
         )
 
         if not torch.cuda.is_available():
@@ -170,7 +171,6 @@ def faithfulness_analysis(config: Dict=None) -> None:
                     map_location=torch.device('cpu')
                 )
             )
-
         else:
             model.load_state_dict(torch.load(model_path))
         
@@ -179,43 +179,45 @@ def faithfulness_analysis(config: Dict=None) -> None:
         if torch.cuda.is_available():
             model.to(device)
 
-        test_data['prediction'] = []
+        test_data_copy = dict(test_data)
+        test_data_copy['prediction'] = []
         
-        for image in test_data['image']:
+        for image in test_data_copy['image']:
             image = torch.from_numpy(image).float()
             
             if torch.cuda.is_available():
                 image = image.to(device)
 
-            test_data['prediction'].append(
+            test_data_copy['prediction'].append(
                 model(image).detach().cpu().numpy().argmax(axis=1)[0]
-        )
+            )
 
-        test_data["correct_predictions"] = np.array(test_data['prediction']) == \
-            np.array(test_data['numeric_label'])
+        test_data_copy["correct_predictions"] = np.array(test_data_copy['prediction']) == \
+            np.array(test_data_copy['numeric_label'])
         
-        for k in test_data:
-            test_data[k] = list(
+        for k in test_data_copy:
+            test_data_copy[k] = list(
                 np.array(
-                    test_data[k]
-                )[test_data["correct_predictions"]]
+                    test_data_copy[k]
+                )[test_data_copy["correct_predictions"]]
             )
         
         test_masker = nl.input_data.NiftiMasker(mask_strategy='background')
-        fitted_masker = test_masker.fit(imgs=test_data['nii_image'])
+        fitted_masker = test_masker.fit(imgs=test_data_copy['nii_image'])
         test_mask = fitted_masker.mask_img_
-        test_images = concat_imgs(test_data['nii_image'])
-        chance_acc = max(collections.Counter(test_data['numeric_label']).values())
-        chance_acc /= len(test_data['numeric_label'])
+        test_images = concat_imgs(test_data_copy['nii_image'])
+        
+        chance_acc = max(collections.Counter(test_data_copy['numeric_label']).values())
+        chance_acc /= len(test_data_copy['numeric_label'])
         chance_acc *= 100
         
         for attribution_method in attribution_methods:
             print(
                 f'...and {attribution_method} attributions.'
             )
-            attribution_images = []
 
-            for test_nii_image_path in test_data['image_path']:
+            attribution_images = []
+            for test_nii_image_path in test_data_copy['image_path']:
                 attribution_paths = get_attribution_paths_for_nii_img(
                     test_nii_image_path,
                     os.path.join(
@@ -225,9 +227,9 @@ def faithfulness_analysis(config: Dict=None) -> None:
                 )
                 attribution_images.append(
                     load_img(attribution_paths[f'fitting-run-{fitting_run}'])
-                )
-                                
+                )          
             attribution_images = concat_imgs(attribution_images)
+
             chance_first_reached.append(
                 pd.DataFrame(
                     {
@@ -240,10 +242,9 @@ def faithfulness_analysis(config: Dict=None) -> None:
                     index=[chance_first_reached_i]
                 )
             )
+
             chance_reached = False
-            
             for fraction in fractions[fractions>=fraction_start]:
-                
                 print(
                     '\t... when occluding {:.1f}% of the data.'.format(fraction)
                 )
@@ -266,7 +267,7 @@ def faithfulness_analysis(config: Dict=None) -> None:
                 occluded_images_pred = occluded_images_pred.detach().cpu().numpy().argmax(axis=1)
                 accuracy = np.mean(
                     occluded_images_pred ==
-                    test_data['numeric_label']
+                    test_data_copy['numeric_label']
                 ) * 100
                 
                 if accuracy <= chance_acc and not chance_reached:
@@ -287,12 +288,11 @@ def faithfulness_analysis(config: Dict=None) -> None:
                         index=[faithfulness_i]
                     )
                 )
-                faithfulness_i += 1
-
                 pd.concat(faithfulness).to_csv(
                     faithfulness_path,
                     index=False
                 )
+                faithfulness_i += 1
 
             pd.concat(chance_first_reached).to_csv(
                 chance_first_reached_path,
@@ -349,7 +349,6 @@ def get_attribution_paths_for_nii_img(
 
 
 def get_argparse() -> argparse.ArgumentParser:
-
     parser = argparse.ArgumentParser(
         description='compute faithulness analysis for attributions of given task.'
     )
@@ -397,10 +396,15 @@ def get_argparse() -> argparse.ArgumentParser:
         help='path where results of faithfulness analysis are stored '
              '(default: results/faithfulness/task-WM)'
     )
-
+    parser.add_argument(
+        "--seed",
+        type=str,
+        metavar='INT',
+        default=12345,
+        help='random seed'
+    )
     return parser
 
 
 if __name__ == '__main__':
-    
     faithfulness_analysis()
