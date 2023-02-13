@@ -870,7 +870,6 @@ def make_config(config: Dict=None):
             'batch_size',
             'learning_rate',
             'dropout',
-            'num_epochs'
         ]:
             print(f'\tsetting {key} to {loaded_config[key]}')
             config[key] = loaded_config[key]
