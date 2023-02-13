@@ -15,7 +15,7 @@ while [ $# -gt 0 ] ; do
     --data-dir) DATA_DIR=${2} ;;
     --attributions-dir) ATTR_DIR=${2} ;;
     --use-random-init) RAND_INIT=${2} ;;
-    --interpret-final-model FINAL_MODEL=${2} ;;
+    --interpret-final-model) FINAL_MODEL=${2} ;;
     --docker-image-dir) IMAGE_DIR=${2} ;;
   esac
   shift
