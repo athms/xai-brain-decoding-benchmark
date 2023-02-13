@@ -34,6 +34,7 @@ def interpret(config: Dict=None) -> None:
     if config is None:
         config = vars(attribute_argsparse().parse_args())
         config['use_random_init'] = config['use_random_init'] == 'True'
+        config['interpret_final_model'] = config['interpret_final_model'] == 'True'
 
     np.random.seed(config["seed"])
     torch.manual_seed(config["seed"])
@@ -116,7 +117,7 @@ def interpret(config: Dict=None) -> None:
         model_path = os.path.join(
             config["fitted_model_dir"],
             f'run-{run}',
-            'best_model.pt'
+            'best_model.pt' if not config['interpret_final_model'] else 'final_model.pt'
         )
         attribution_methods = [
             DeepLift,
@@ -375,7 +376,16 @@ def attribute_argsparse() -> argparse.ArgumentParser:
         type=str,
         choices=('True', 'False'),
         required=False,
-        help='path where attributions are stored (default: results/attributions)'
+        help='path where attributions are stored (default: False)'
+    )
+    parser.add_argument(
+        '--interpret-final-model',
+        metavar='BOOL',
+        default='False',
+        type=str,
+        choices=('True', 'False'),
+        required=False,
+        help='whether to interpret best (False) or final (True) model (default: False)'
     )
     parser.add_argument(
         '--seed',

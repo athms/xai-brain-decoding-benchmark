@@ -15,6 +15,7 @@ while [ $# -gt 0 ] ; do
     --data-dir) DATA_DIR=${2} ;;
     --attributions-dir) ATTR_DIR=${2} ;;
     --use-random-init) RAND_INIT=${2} ;;
+    --interpret-final-model FINAL_MODEL=${2} ;;
     --docker-image-dir) IMAGE_DIR=${2} ;;
   esac
   shift
@@ -28,6 +29,7 @@ DATA_DIR=${DATA_DIR:-"${PROJ_DIR}/data/task-${TASK}"}
 ATTR_DIR=${ATTR_DIR:-"${PROJ_DIR}/results/attributions/task-${TASK}"}
 mkdir -p $ATTR_DIR
 RAND_INIT=${RAND_INIT:-"False"}
+FINAL_MODEL=${FINAL_MODEL:-"False"}
 IMAGE_DIR=${IMAGE_DIR:-"${PROJ_DIR}/images/"}
 
 # TACC-specific imports
@@ -54,4 +56,5 @@ singularity run \
     --fitted-model-dir /model \
     --data-dir /data \
     --attributions-dir /attr \
-    --use-random-init $RAND_INIT
+    --use-random-init $RAND_INIT \
+    --interpret-final-model $FINAL_MODEL
