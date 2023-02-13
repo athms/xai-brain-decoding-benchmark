@@ -148,7 +148,6 @@ def interpret(config: Dict=None) -> None:
                 print(
                     '/!\ Using random weight initializations for attribution'
                 )
-
             else:
                 if not torch.cuda.is_available():
                     model.load_state_dict(
