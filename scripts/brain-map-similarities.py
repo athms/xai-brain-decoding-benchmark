@@ -2,8 +2,9 @@
 
 import os
 import argparse
-import numpy as np
 import pandas as pd
+import numpy as np
+from scipy.stats import pearsonr
 from sklearn.feature_selection import mutual_info_regression
 from nilearn.masking import compute_background_mask, apply_mask
 from nilearn.image import resample_to_img
@@ -15,6 +16,9 @@ def compute_brain_map_similarities(config=None) -> None:
     
     if config is None:
         config = vars(get_argparse().parse_args())
+
+    np.random.seed(config['seed'])
+    random_state = np.random.RandomState(config['seed'])
     
     os.makedirs(
         os.path.join(
@@ -145,7 +149,8 @@ def compute_brain_map_similarities(config=None) -> None:
                 ) = compute_similarity_metrics(
                     attribution_image=attribution_image_path,
                     bold_image=bold_image_path,
-                    meta_image=meta_image_path
+                    meta_image=meta_image_path,
+                    random_state=random_state
                 )
 
                 brain_map_similarities.append(
@@ -176,7 +181,7 @@ def compute_brain_map_similarities(config=None) -> None:
             print('Done!')
 
 
-def compute_similarity_metrics(attribution_image, bold_image, meta_image):
+def compute_similarity_metrics(attribution_image, bold_image, meta_image, random_state):
     """helper function to compute mutual inforiation and pearson correlation,
     between attribution image and {bold, meta} images
     
@@ -201,12 +206,14 @@ def compute_similarity_metrics(attribution_image, bold_image, meta_image):
     mi_bold = mutual_info_regression(
         X=attribution_masked.reshape(-1,1),
         y=bold_masked,
-        discrete_features=False
+        discrete_features=False,
+        random_state=random_state
     )
     mi_meta = mutual_info_regression(
         X=attribution_masked.reshape(-1,1),
         y=meta_masked,
-        discrete_features=False
+        discrete_features=False,
+        random_state=random_state
     )
     # pearson correlation
     r_bold, _ = pearsonr(attribution_masked, bold_masked)
@@ -271,6 +278,14 @@ def get_argparse() -> argparse.ArgumentParser:
         required=False,
         help='path where data of analysis are stored '
              '(default: results/brain_map_similarity/task-WM)'
+    )
+    parser.add_argument(
+        '--seed',
+        metavar='INT',
+        default=12345,
+        type=int,
+        required=False,
+        help='random seed (default: 12345)'
     )
     return parser
 
