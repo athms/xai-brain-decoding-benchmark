@@ -19,10 +19,7 @@ def test_hdi(hdi: np.ndarray, true_value: float = 0) -> bool:
     return hdi[0] <= true_value <= hdi[1]
 
 
-def fig_brain_maps_similarity(
-    config=None,
-    similarity_metric='mi',
-    fig_filename='Fig-3_brain-maps-similarity.png') -> None:
+def fig_brain_maps_similarity(config=None) -> None:
     """Script's main function; creates overview figure
     for results of running vscripts/brain-map-similaritues_analysis.py"""
     
@@ -100,7 +97,7 @@ def fig_brain_maps_similarity(
                 subjects = None
             plotting_df = pd.DataFrame({
                 'method': brain_map_similarities['method'],
-                similarity_metric: brain_map_similarities[f'{similarity_metric}_bold'],
+                'mi': brain_map_similarities[f'mi_bold'],
                 'Reference': 'Group BOLD',
                 'subject': subjects
             })
@@ -108,7 +105,7 @@ def fig_brain_maps_similarity(
                 plotting_df,
                 pd.DataFrame({
                     'method': brain_map_similarities['method'],
-                    similarity_metric: brain_map_similarities[f'{similarity_metric}_meta'],
+                    'mi': brain_map_similarities[f'mi_meta'],
                     'Reference': 'Meta Analysis',
                     'subject': subjects
                     
@@ -119,7 +116,7 @@ def fig_brain_maps_similarity(
                 ax = sns.barplot(
                     data=plotting_df,
                     x="method",
-                    y=similarity_metric,
+                    y='mi',
                     hue='Reference',
                     ax=ax,
                     order=method_ordering,
@@ -131,13 +128,13 @@ def fig_brain_maps_similarity(
             
             elif analysis_level == 'subject':
                 subject_means = plotting_df.groupby(
-                    ['method', 'Reference', 'subject'])[similarity_metric].mean().reset_index()
+                    ['method', 'Reference', 'subject'])['mi'].mean().reset_index()
                 subject_means['task'] = task
                 mfx_data.append(subject_means)
                 ax = sns.violinplot(
                     data=subject_means,
                     x="method",
-                    y=similarity_metric,
+                    y='mi',
                     hue='Reference',
                     ax=ax,
                     order=method_ordering,
@@ -150,7 +147,7 @@ def fig_brain_maps_similarity(
                 )
                 ax.legend_.remove()
 
-                for ri, reference in enumerate(['bold', 'meta']):
+                for ri, reference in enumerate(subject_means['Reference'].unique()):
                     # compute mixed effects model
                     mfx_results_path = os.path.join(
                         config["mfx_dir"],
@@ -168,7 +165,7 @@ def fig_brain_maps_similarity(
                         subject_means_ref.rename(columns=colname_mapper, inplace=True)
                         subject_means_ref['DeepLift'] = 0
                         fixed_effects = " + ".join([m for m in method_ordering if m!='DeepLift']) # DeepLift is the reference method
-                        model_string = f"{similarity_metric} ~ {fixed_effects}"
+                        model_string = f"mi ~ {fixed_effects}"
                         print(
                             f'\nComputing regression model for {reference} reference:\n\t{model_string}\n'
                         )
@@ -212,7 +209,7 @@ def fig_brain_maps_similarity(
                             if 0 < mfx_result.loc[method, 'hdi_3%']:
                                 ax.text(
                                     s='*',
-                                    x=mi-0.25 if reference=='bold' else mi+0.25,
+                                    x=mi-0.25 if ri==0 else mi+0.25,
                                     y=float(ax.get_ylim()[1])*0.9,
                                     ha='center',
                                     va='bottom',
@@ -228,12 +225,11 @@ def fig_brain_maps_similarity(
                 )
             
             ax.set_xlabel('')
-            ylabel = " ".join(similarity_metric.upper().split('_'))
             if analysis_level == 'group':
-                ylabel += '('+r'$Attr_{Group}; Ref$'+')'
+                ylabel = 'I('+r'$Attr_{Group}; Ref$'+')'
             
             elif analysis_level == 'subject':
-                ylabel += '('+r'$Attr_{Ind}; Ref$'+')'
+                ylabel = '_('+r'$Attr_{Ind}; Ref$'+')'
             
             else:
                 raise ValueError(
@@ -273,7 +269,7 @@ def fig_brain_maps_similarity(
     fig.savefig(
         fname=os.path.join(
             config["figures_dir"],
-            fig_filename
+            'Fig-3_brain-maps-similarity.png'
         ),
         dpi=300
     )
@@ -296,7 +292,7 @@ def fig_brain_maps_similarity(
         mfx_data['DeepLift'] = 0
         mfx_effects = [m for m in method_ordering if m!='DeepLift'] # DeepLift is the reference method
         fixed_effects = " + ".join(mfx_effects)
-        model_string = f"{similarity_metric} ~ {fixed_effects} + ({fixed_effects}|task)"
+        model_string = f"mi ~ {fixed_effects} + ({fixed_effects}|task)"
         print(
             f'\nComputing mixed effects model:\n\t{model_string}\n'
         )
