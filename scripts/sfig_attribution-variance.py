@@ -39,7 +39,7 @@ def fig_attribution_variance(config: Dict=None) -> None:
 
     fig, fig_axs = plt.subplots(
         3, 9, # tasks x attribution methods
-        figsize=(14, 5),
+        figsize=(12, 4),
         dpi=300,
         sharex='row'
     )
@@ -216,21 +216,21 @@ def fig_attribution_variance(config: Dict=None) -> None:
             if i>0:
                 ax.set_ylabel('')
             else:
-                ax.set_ylabel('Var(Attributions)')
+                ax.set_ylabel(f'{task}\n\nVar(Attributions)')
             if task_i<2:
                 ax.set_xlabel('')
             else:
-                ax.set_xlabel('Accuracy')
+                ax.set_xlabel('Accuracy (%)')
 
-        fig.tight_layout()
-        fig.savefig(
-            os.path.join(
-                config['figures_dir'],
-                f'Fig-X_attribution-variance.png'
-            ),
-            dpi=300
-        )
-        print('..done.')
+    fig.tight_layout()
+    fig.savefig(
+        os.path.join(
+            config['figures_dir'],
+            f'Sfig_attribution-variance.png'
+        ),
+        dpi=300
+    )
+    print('..done.')
         
 
 def get_argparse(parser: argparse.ArgumentParser=None) -> argparse.ArgumentParser:
