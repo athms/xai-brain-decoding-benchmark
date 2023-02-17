@@ -122,7 +122,7 @@ def fig_faithfulness(config=None) -> None:
 
         axs[0].set_xticks(fractions)
         axs[0].set_xticklabels([int(i) if i%1==0 else '' for i in fractions])
-        axs[0].set_xlim(0, 40)
+        axs[0].set_xlim(0, 50)
         axs[0].set_ylabel(f'{task}\n\nTest accuracy (%)')
 
         if task_i == 1:

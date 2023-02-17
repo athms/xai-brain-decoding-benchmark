@@ -106,7 +106,7 @@ def fig_brain_maps_similarity(config=None) -> None:
                 pd.DataFrame({
                     'method': brain_map_similarities['method'],
                     'mi': brain_map_similarities[f'mi_meta'],
-                    'Reference': 'Meta Analysis',
+                    'Reference': 'Meta-analysis',
                     'subject': subjects
                     
                 })
@@ -226,10 +226,10 @@ def fig_brain_maps_similarity(config=None) -> None:
             
             ax.set_xlabel('')
             if analysis_level == 'group':
-                ylabel = 'I('+r'$Attr_{Group}; Ref$'+')'
+                ylabel = r'$I(Attr_{Group}; Ref)$'
             
             elif analysis_level == 'subject':
-                ylabel = '_('+r'$Attr_{Ind}; Ref$'+')'
+                ylabel = r'$I(Attr_{Ind}; Ref)$'
             
             else:
                 raise ValueError(

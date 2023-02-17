@@ -178,33 +178,12 @@ def fig_decoding_performance(config: Dict=None) -> None:
                 axs[history_i].plot(
                     history_run['epoch'],
                     history_run['accuracy']*100,
-                    color='gray',
+                    color='k',
                     alpha=0.5,
-                    lw=1,
+                    lw=0.75,
                 )
                 if history_run['epoch'].max() > max_epoch:
                     max_epoch = history_run['epoch'].max()
-            # history_grouped = history.groupby(['run', 'epoch']).accuracy.mean().groupby('epoch')
-            # history_min = history_grouped.min() * 100
-            # history_max = history_grouped.max() * 100
-            # history_mean = history_grouped.mean() * 100
-            # epochs = np.sort(history['epoch'].unique())
-            # axs[history_i].plot(
-            #     epochs,
-            #     history_mean,
-            #     color='gray',
-            #     zorder=history_i,
-            #     lw=1,
-            # )
-            # axs[history_i].fill_between(
-            #     epochs,
-            #     history_min,
-            #     history_max,
-            #     alpha=0.3,
-            #     color='gray',
-            #     zorder=history_i,
-            #     linewidth=0.0
-            # )
             axs[history_i].set_ylim(0, 100)
             axs[history_i].set_xlim(0, max_epoch)
             epochs = np.arange(0, max_epoch+5, 5) if max_epoch<31 else np.arange(0, max_epoch+10, 10)
@@ -229,7 +208,6 @@ def fig_decoding_performance(config: Dict=None) -> None:
                         map_location=torch.device('cpu')
                     )
                 )
-
             else:
                 model.load_state_dict(torch.load(model_path))
 
@@ -257,7 +235,7 @@ def fig_decoding_performance(config: Dict=None) -> None:
             conf_mat += confusion_matrix(
                 y_true=test_data['numeric_label'],
                 y_pred=np.array(test_data['prediction']),
-                normalize='true'
+                normalize='pred'
             ) * 100
 
         conf_mat /= len(fitting_runs)
@@ -271,17 +249,16 @@ def fig_decoding_performance(config: Dict=None) -> None:
             axs[2].set_title('Test')
 
         # plot final decoding accuracies:
-        axs[2] = sns.swarmplot(
+        axs[2] = sns.violinplot(
             y=np.array(acc),
             ax=axs[2],
-            alpha=0.7,
-            color='gray',
-            edgecolor='gray',
-            linewidth=0.5
+            color='lightgray',
+            edgecolor='k',
+            linewidth=0.75
         )
         axs[2].set_ylim(0, 100)
         axs[2].set_xticks([0])
-        axs[2].set_xticklabels(['Final epoch'])
+        axs[2].set_xticklabels(['Best epoch'])
         axs[2].text(
             0.5,
             0.25,
@@ -296,11 +273,11 @@ def fig_decoding_performance(config: Dict=None) -> None:
         )
 
         if task_i == 0:
-            axs[3].set_title('Test\nconfusion (%)')
+            axs[3].set_title('Mean test\nconfusion (%)')
 
         # plot average confusion matrix:
         sns.heatmap(
-            conf_mat.astype(int), # we are conservative and rounding down
+            conf_mat.astype(int),
             vmax=100,
             vmin=0,
             center=50,
