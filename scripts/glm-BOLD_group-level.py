@@ -68,14 +68,14 @@ def compute_group_level_BOLD_glm_maps(config=None) -> None:
                 f'{label}_zmap.nii.gz'
             )
         )
-        stat_map_thresholded, threshold = threshold_stats_img(
-            stat_img=stat_map,
-            mask_img=mask_img,
-            alpha=0.01,
-            height_control='fpr'
-        )
+        # stat_map_thresholded, threshold = threshold_stats_img(
+        #     stat_img=stat_map,
+        #     mask_img=mask_img,
+        #     alpha=0.01,
+        #     height_control='fpr'
+        # )
         plot_brain_img(
-            img=stat_map_thresholded,
+            img=stat_map,
             path=os.path.join(
                 config['group_level_maps_dir'],
                 f'{label}_zmap.png'
@@ -84,7 +84,7 @@ def compute_group_level_BOLD_glm_maps(config=None) -> None:
                 config['group_level_maps_dir'],
                 'tmp/'
             ),
-            threshold=threshold,
+            threshold=None,
             dpi=300
         )
         clear_matplotlib_fig_cache()

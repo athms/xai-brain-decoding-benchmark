@@ -20,6 +20,7 @@ def sanity_checks_analysis(config=None) -> None:
         config = vars(get_argparse().parse_args())
 
     np.random.seed(config['seed'])
+    random_state = np.random.RandomState(config['seed'])
 
     os.makedirs(
         os.path.join(
@@ -117,12 +118,14 @@ def sanity_checks_analysis(config=None) -> None:
                     rl_mi = mutual_info_regression(
                         X=randomized_labels_img_dat.reshape(-1,1),
                         y=img_dat,
-                        discrete_features=False
+                        discrete_features=False,
+                        random_state=random_state
                     )
                     rm_mi = mutual_info_regression(
                         X=randomized_model_img_dat.reshape(-1,1),
                         y=img_dat,
-                        discrete_features=False
+                        discrete_features=False,
+                        random_state=random_state
                     )
                     randomized_labels_df.append(
                         pd.DataFrame(
@@ -228,7 +231,7 @@ def get_argparse() -> argparse.ArgumentParser:
     parser.add_argument(
         '--seed',
         metavar='INT',
-        default=1234,
+        default=12345,
         type=int,
         required=False,
         help='random seed'
@@ -238,5 +241,4 @@ def get_argparse() -> argparse.ArgumentParser:
 
 
 if __name__ == '__main__':
-    
     sanity_checks_analysis()
