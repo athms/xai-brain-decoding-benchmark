@@ -106,7 +106,7 @@ def fig_sanity_checks(config=None) -> None:
         ylabel=r'$I(Attr_{Orig}; Attr_{Rand})$'
         axs[0].set_ylabel(f'{task}\n\n{ylabel}')
         axs[0].set_ylim(0.45, -0.1)
-        axs[0].axhline(0, lw=0.5, ls='--', color='gray')
+        axs[0].axhline(0, lw=1, ls='--', color='gray')
 
         # compute mixed effects model
         mfx_results_path = os.path.join(
@@ -222,7 +222,7 @@ def fig_sanity_checks(config=None) -> None:
         axs[1].set_xlabel('') 
         axs[1].set_ylabel(r'$I(Attr_{Orig}; Attr_{Rand})$')
         axs[1].set_ylim(0.45, -0.1)
-        axs[1].axhline(0, lw=0.5, ls='--', color='gray')
+        axs[1].axhline(0, lw=1, ls='--', color='gray')
 
         # compute mixed effects model
         mfx_results_path = os.path.join(
