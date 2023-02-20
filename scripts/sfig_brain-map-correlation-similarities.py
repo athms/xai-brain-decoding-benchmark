@@ -38,7 +38,7 @@ def sfig_brain_map_correlation_similarity(config=None) -> None:
         DEEF
         GHHI
         """,
-        figsize=(8, 6),
+        figsize=(9, 6),
         dpi=300
     )
 
