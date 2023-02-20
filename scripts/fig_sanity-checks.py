@@ -105,7 +105,8 @@ def fig_sanity_checks(config=None) -> None:
         axs[0].set_xlabel('')
         ylabel=r'$I(Attr_{Orig}; Attr_{Rand})$'
         axs[0].set_ylabel(f'{task}\n\n{ylabel}')
-        axs[0].set_ylim(0.6, 0)
+        axs[0].set_ylim(0.45, -0.1)
+        axs[0].axhline(0, lw=0.5, ls='--', color='gray')
 
         # compute mixed effects model
         mfx_results_path = os.path.join(
@@ -168,7 +169,7 @@ def fig_sanity_checks(config=None) -> None:
                     axs[0].text(
                         s='*',
                         x=mi,
-                        y=0.6, #float(axs[0].get_ylim()[1])*0.9,
+                        y=0.05, #float(axs[0].get_ylim()[1])*0.9,
                         ha='center',
                         va='bottom',
                         fontsize=20
@@ -220,7 +221,8 @@ def fig_sanity_checks(config=None) -> None:
         sns.despine(ax=axs[1])  
         axs[1].set_xlabel('') 
         axs[1].set_ylabel(r'$I(Attr_{Orig}; Attr_{Rand})$')
-        axs[1].set_ylim(0.6, 0)
+        axs[1].set_ylim(0.45, -0.1)
+        axs[1].axhline(0, lw=0.5, ls='--', color='gray')
 
         # compute mixed effects model
         mfx_results_path = os.path.join(
@@ -283,7 +285,7 @@ def fig_sanity_checks(config=None) -> None:
                     axs[1].text(
                         s='*',
                         x=mi,
-                        y=0.6, #float(axs[1].get_ylim()[1])*0.9,
+                        y=0.05, #float(axs[1].get_ylim()[1])*0.9,
                         ha='center',
                         va='bottom',
                         fontsize=20
