@@ -14,9 +14,9 @@ sns.set_theme(
 )
 
 
-def sfig_brain_maps_similarity(config=None) -> None:
-    """Script's main function; creates overview figure
-    for results of running vscripts/brain-map-similaritues_analysis.py"""
+def sfig_brain_map_correlation_similarity(config=None) -> None:
+    """Script's main function; shows similarity of attribution
+    and BOLD maps as measured by Pearson correltion."""
     
     if config is None:
         config = vars(get_argparse().parse_args())
@@ -34,9 +34,9 @@ def sfig_brain_maps_similarity(config=None) -> None:
 
     fig, fig_axs = plt.subplot_mosaic(
         """
-        ABB
-        CDD
-        EFF
+        ABBC
+        DEEF
+        GHHI
         """,
         figsize=(8, 6),
         dpi=300
@@ -57,19 +57,22 @@ def sfig_brain_maps_similarity(config=None) -> None:
     # collect data for mixed effects model
     mfx_data = []
 
-    for task_i, (task, axs) in enumerate(
+    for task_i, (task, task_axs) in enumerate(
         zip(
             ['heat-rejection', 'MOTOR', 'WM'],
             [
-                [fig_axs['A'], fig_axs['B']],
-                [fig_axs['C'], fig_axs['D']],
-                [fig_axs['E'], fig_axs['F']]
+                [fig_axs['A'], fig_axs['B'], fig_axs['C']],
+                [fig_axs['D'], fig_axs['E'], fig_axs['F']],
+                [fig_axs['G'], fig_axs['H'], fig_axs['I']]
             ]
         )
     ):
 
-        for ai, analysis_level in enumerate(['group', 'subject']):
-            ax = axs[ai]
+        for analysis_level in ['group', 'subject']:
+            if analysis_level == 'group':
+                axs = [task_axs[0]]
+            else:
+                axs = task_axs[1:]
             brain_map_similarities = pd.read_csv(
                 os.path.join(
                     config["brain_maps_similarity_base_dir"],
@@ -93,6 +96,7 @@ def sfig_brain_maps_similarity(config=None) -> None:
             plotting_df = pd.DataFrame({
                 'method': brain_map_similarities['method'],
                 'r': brain_map_similarities['r_bold'],
+                'mi': brain_map_similarities['mi_bold'],
                 'subject': subjects
             })
 
@@ -101,7 +105,7 @@ def sfig_brain_maps_similarity(config=None) -> None:
                     data=plotting_df,
                     x="method",
                     y='r',
-                    ax=ax,
+                    ax=axs[0],
                     order=method_ordering,
                     palette=sns.color_palette("Paired"),
                     linewidth=.5,
@@ -111,20 +115,37 @@ def sfig_brain_maps_similarity(config=None) -> None:
             
             elif analysis_level == 'subject':
                 subject_means = plotting_df.groupby(
-                    ['method', 'subject'])['r'].mean().reset_index()
+                    ['method', 'subject'])[['r', 'mi']].mean().reset_index()
                 subject_means['task'] = task
                 mfx_data.append(subject_means)
                 ax = sns.swarmplot(
                     data=subject_means,
                     x="method",
                     y='r',
-                    ax=ax,
+                    ax=axs[0],
                     order=method_ordering,
                     alpha=0.75,
                     size=4,
                     edgecolor='gray',
                     linewidth=0.5,
                     palette=sns.color_palette("Paired"),
+                )
+                # also plot correlation of r and mi
+                sns.regplot(
+                    data=subject_means,
+                    x='mi',
+                    y='r',
+                    ax=axs[1],
+                    scatter_kws={
+                        "s": 10,
+                        "alpha": 0.75,
+                        "linewidth": 0.5
+                    },
+                    line_kws={
+                        "lw": 0.75,
+                        "color": 'red'
+                    },
+                    color='gray'
                 )
 
                 # compute mixed effects model
@@ -214,7 +235,7 @@ def sfig_brain_maps_similarity(config=None) -> None:
                     f'Unknown analysis level: {analysis_level}'
                 )
             
-            if ai == 0:
+            if analysis_level=='group':
                 ylabel = f'{task}\n\n{ylabel}'
 
             ax.set_ylabel(ylabel)
@@ -228,11 +249,16 @@ def sfig_brain_maps_similarity(config=None) -> None:
                     fontweight='light',
                     horizontalalignment='right'
                 )
-            
             else:
                 ax.set_xticklabels([])
+            
+            if analysis_level=='subject':
+                axs[1].set_ylabel('r('+r'$Attr_{Ind}; BOLD_{Group}$'+')')
+                axs[1].set_xlabel('I('+r'$Attr_{Ind}; BOLD_{Group}$'+')')
+                sns.despine(ax=axs[1])
+
         
-    for label in list('ABCDEF'):
+    for label in list('ABCDEFGHI'):
         fig_axs[label].text(
             -0.05,
             1.25,
@@ -250,66 +276,6 @@ def sfig_brain_maps_similarity(config=None) -> None:
         ),
         dpi=300
     )
-
-    # compute mixed effects model
-    mfx_results_path = os.path.join(
-        config["mfx_dir"],
-        'brain-map-correlation-similarities_mfx-results.csv'
-    )
-    if not os.path.isfile(mfx_results_path):
-        mfx_data = pd.concat(mfx_data)
-        mfx_data = mfx_data[mfx_data['method'].isin(method_ordering)]
-        mfx_data = pd.get_dummies(mfx_data, columns=['method'])
-        colname_mapper = {
-            c: c.split('method_')[1]
-            for c in mfx_data.columns
-            if 'method' in c
-        }
-        mfx_data.rename(columns=colname_mapper, inplace=True)
-        mfx_data['DeepLift'] = 0
-        mfx_effects = [m for m in method_ordering if m!='DeepLift'] # DeepLift is the reference method
-        fixed_effects = " + ".join(mfx_effects)
-        model_string = f"r ~ {fixed_effects} + ({fixed_effects}|task)"
-        print(
-            f'\nComputing mixed effects model:\n\t{model_string}\n'
-        )
-        mfx_model = bmb.Model(model_string, mfx_data)
-        
-        n_tune = 5000
-        converged = False
-        while not converged:
-            results = mfx_model.fit(
-                draws=5000,
-                tune=n_tune,
-                chains=4,
-                random_seed=config['seed']
-            )
-            mfx_result = az.summary(results)
-            
-            if all(np.abs(mfx_result['r_hat']-1) < .05):
-                converged = True
-            
-            n_tune += 5000
-
-        az.plot_trace(results);
-        plt.tight_layout()
-        os.makedirs(
-            config["mfx_dir"],
-            exist_ok=True
-        )
-        plt.savefig(
-            fname=os.path.join(
-                config["mfx_dir"],
-                'brain-map-correlation-similarities_mfx-trace.png'
-            ),
-            dpi=300
-        )
-        mfx_result.to_csv(mfx_results_path)
-    
-    else:
-        mfx_result = pd.read_csv(mfx_results_path)
-
-    print(mfx_result)
 
     return fig
 
@@ -356,4 +322,4 @@ def get_argparse() -> argparse.ArgumentParser:
 
 
 if __name__ == '__main__':
-    sfig_brain_maps_similarity();
+    sfig_brain_map_correlation_similarity();
