@@ -19,6 +19,7 @@ Find below an overview of the repository organization. Note that the results dir
 |                        - 'glm_bold': computes subject- and group-level GLM maps for BOLD data
 |                        - 'interpret': interprets decoding decisions of trained models
 |                        - 'glm_attributions': computes subject- and group-level GLM maps for attribution data
+|                        - 'meta': runs meta-anlaysis with NeuroQuery
 |                        - 'similarity':  similarity analysis for BOLD and attribution brain maps and creates Figure 3
 |                        - 'faithfulness': computes faithulness analysis for attributions and creates Figure 4 
 |                        - 'sanity_checks': computes sanity checks for attributions and creates Figure 5
@@ -41,7 +42,6 @@ Find below an overview of the repository organization. Note that the results dir
 |    └── plotting.sh          <- Plotting of brain maps
 |
 └── scripts/
-|    ├── attribute.py                               <- Interpretation of model decoding decisions
 |    ├── brain-map-similarities.py                  <- Similarity analysis of BOLD and attribution brain maps
 |    ├── faithfulness.py                            <- Faithfulness analysis of attributions
 |    ├── fig_brain-map-similarities.py              <- Figure 3 of the manuscript
@@ -55,8 +55,13 @@ Find below an overview of the repository organization. Note that the results dir
 |    ├── glm-BOLD_trial-level.py                    <- Trial-level BOLD GLM maps for WM and MOTOR datasets
 |    ├── hyperopt.py                                <- 3D-CNN hyper-parameter optimization for each dataset
 |    ├── identify-best-model-configurations.py      <- Identify best model configurations from hyperopt results
+|    ├── interpret.py                               <- Interpretation of model decoding decisions
+|    ├── meta-analysis.py                           <- Running meta-analysis with NeuroQuery
 |    ├── rearrange_hcp-source_to_BIDS.py            <- Re-format HCP source data to BIDS-like format
 |    ├── sanity-checks.py                           <- Sanity checks analysis
+|    ├── sfig_attribution-variance.py               <- Supplementary Figure 1
+|    ├── sfig_brain-map-correlation-similarity.py   <- Supplementary Figure 2
+|    ├── sfig_randomized-labels-performance.py      <- Supplementary Figure 3
 |    └── train.py                                   <- Training of 3D-CNN for a given dataset
 |
 └── results/
@@ -65,6 +70,8 @@ Find below an overview of the repository organization. Note that the results dir
 |    ├── faithfulness           <- results from faithfulness analysis by dataset (as resulting from 'faithfulness.py')
 |    ├── glm                    <- subject- and group-level GLM maps by dataset (as resulting from 'glm-*.py' scripts)
 |    ├── hyperopt               <- logging directory for hyper-parameter optimization by dataset (as resulting from 'hyperopt.py')
+|    ├── meta_analysis          <- results of meta-analysis by dataset (as resulting from 'meta_analysis.py' script)
+|    ├── mfx                    <- results of statistical modeling
 |    ├── models                 <- model fitting runs for each dataset (as resulting from 'train.py')
 |    └── sanity_checks          <- results of sanity checks analysis by dataset (as resulting from 'sanity-checks.py') 
 ```
