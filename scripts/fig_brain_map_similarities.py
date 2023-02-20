@@ -209,12 +209,12 @@ def fig_brain_maps_similarity(config=None) -> None:
                             if 0 < mfx_result.loc[method, 'hdi_3%']:
                                 ax.text(
                                     s='*',
-                                    x=mi-0.25 if ri==0 else mi+0.25,
+                                    x=mi-0.2 if ri==0 else mi+0.2,
                                     y=float(ax.get_ylim()[1])*0.9,
                                     ha='center',
                                     va='bottom',
                                     fontsize=20,
-                                    color=sns.color_palette("colorblind",2)[ri]
+                                    color='k' #sns.color_palette("colorblind",2)[ri]
                                 )
 
                 ax.set_ylim(0,  float(ax.get_ylim()[1])*1.15)
