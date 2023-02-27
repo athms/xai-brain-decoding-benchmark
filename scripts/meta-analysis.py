@@ -20,7 +20,11 @@ QUERIES = {
     'MOTOR': {
         'f': 'foot',
         'h': 'hand',
-        't': 'tongue movement'
+        't': 'tongue movement',
+        'lf': 'left foot',
+        'rf': 'right foot',
+        'lh': 'left hand',
+        'rh': 'right hand'
     },
     'heat-rejection': {
         'heat': 'pain perception',
