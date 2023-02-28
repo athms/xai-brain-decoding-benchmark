@@ -272,7 +272,7 @@ def sfig_brain_map_correlation_similarity(config=None) -> None:
     fig.savefig(
         fname=os.path.join(
             config["figures_dir"],
-            'Sfig_brain-maps-correlation-similarity.png'
+            'Sfig_brain-maps-correlation-similarity.jpg'
         ),
         dpi=300
     )

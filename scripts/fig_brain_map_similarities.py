@@ -269,7 +269,7 @@ def fig_brain_maps_similarity(config=None) -> None:
     fig.savefig(
         fname=os.path.join(
             config["figures_dir"],
-            'Fig-3_brain-maps-similarity.png'
+            'Fig-3_brain-maps-similarity.jpg'
         ),
         dpi=300
     )

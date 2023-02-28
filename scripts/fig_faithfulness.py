@@ -269,7 +269,7 @@ def fig_faithfulness(config=None) -> None:
     fig.savefig(
         fname=os.path.join(
             config['figures_dir'],
-            'Fig-4_faithfulness.png'
+            'Fig-4_faithfulness.jpg'
         ),
         dpi=300
     )

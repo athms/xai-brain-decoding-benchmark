@@ -115,7 +115,7 @@ def randomized_labels_performance(config: Dict=None) -> None:
     fig.savefig(
         os.path.join(
             config['figures_dir'],
-            f'Sfig_randomized-labels-performance.png'
+            f'Sfig_randomized-labels-performance.jpg'
         ),
         dpi=300
     )

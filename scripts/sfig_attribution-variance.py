@@ -226,7 +226,7 @@ def fig_attribution_variance(config: Dict=None) -> None:
     fig.savefig(
         os.path.join(
             config['figures_dir'],
-            f'Sfig_attribution-variance.png'
+            f'Sfig_attribution-variance.jpg'
         ),
         dpi=300
     )

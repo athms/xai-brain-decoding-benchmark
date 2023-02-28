@@ -325,7 +325,7 @@ def fig_decoding_performance(config: Dict=None) -> None:
     fig.savefig(
         os.path.join(
             config['figures_dir'],
-            f'Fig-1_decoding-performance.png'
+            f'Fig-1_decoding-performance.jpg'
         ),
         dpi=300
     )

@@ -320,7 +320,7 @@ def fig_sanity_checks(config=None) -> None:
     fig.savefig(
         fname=os.path.join(
             config["figures_dir"],
-            'Fig-5_sanity-checks.png'
+            'Fig-5_sanity-checks.jpg'
         ),
         dpi=300
     )
