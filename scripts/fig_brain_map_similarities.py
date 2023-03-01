@@ -121,6 +121,8 @@ def fig_brain_maps_similarity(config=None) -> None:
                     ax=ax,
                     order=method_ordering,
                     palette=sns.color_palette("colorblind",2),
+                    linewidth=.5,
+                    edgecolor="0",
                     ci=None,
                 )
                 if task != 'heat-rejection':
