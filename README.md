@@ -12,8 +12,6 @@ Thomas, A. W., Ré, C., & Poldrack, R. A. (2023). Benchmarking explanation metho
 
 ## Project organization
 
-Note that the listed `results` directory is not included in this repostiory due to storage capacity limits.
-
 ```bash
 ├── Makefile           <- Makefile with the following targets ('all' runs all commands in sequence):
 |                        - 'hyperopt': runs 3D-CNN hyper-parameter optimization for each dataset  
@@ -77,3 +75,5 @@ Note that the listed `results` directory is not included in this repostiory due 
 |    ├── models                 <- model fitting runs for each dataset (as resulting from 'train.py')
 |    └── sanity_checks          <- results of sanity checks analysis by dataset (as resulting from 'sanity-checks.py') 
 ```
+
+Note that the `results` directory is not included in this repostiory due to storage capacity limits.
