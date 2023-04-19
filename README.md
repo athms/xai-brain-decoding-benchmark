@@ -1,16 +1,14 @@
-# Comparing interpretation methods in mental state decoding analyses with deep learning models
+# Benchmarking explanation methods for mental state decoding with deep learning models
 
 ## Overview
 
-This repository contains the code underlying our new [preprint](https://arxiv.org/abs/2205.15581): 
+This repository contains the code for: 
 
-Thomas, A. W., Ré, C., & Poldrack, R. A. (2022). Comparing interpretation methods in mental state decoding analyses with deep learning models. arXiv preprint arXiv:2205.15581. 
-
-**Beware:** *I'm still in the process of setting up this repository; some bugs are therefore possible/likely. In case things don't work as expected, please open up a respective Issue*
+Thomas, A. W., Ré, C., & Poldrack, R. A. (2023). Benchmarking explanation methods for mental state decoding with deep learning models. NeuroImage, 120109. [doi.org/10.1016/j.neuroimage.2023.120109](doi.org/10.1016/j.neuroimage.2023.120109).
 
 ## Project organization
 
-Find below an overview of the repository organization. Note that the results directory is not included in this repostiory due to storage capacity limits; We solely outline its structure below.
+Note that the listed `results` directory is not included in this repostiory due to storage capacity limits.
 
 ```bash
 ├── Makefile           <- Makefile with the following targets ('all' runs all commands in sequence):
@@ -33,7 +31,7 @@ Find below an overview of the repository organization. Note that the results dir
 |    ├──task-WM               <- Trial-level GLM BOLD maps for WM dataset
 |    └──task-MOTOR            <- Trial-level GLM BOLD maps for MOTOR dataset
 |
-├── figures/           <- Figures 1, 2-5 of the manuscript. Figure 2 is created manually by the use of the brain maps resulting from the group-level GLM analysis scripts (ie., 'glm-BOLD_group-level.py' and 'glm-attributions_group-level.py')
+├── figures/
 |
 ├── src/
 |    ├── __init__.py          <- Initializes 'src' module
@@ -42,12 +40,12 @@ Find below an overview of the repository organization. Note that the results dir
 |    └── plotting.sh          <- Plotting of brain maps
 |
 └── scripts/
-|    ├── brain-map-similarities.py                  <- Similarity analysis of BOLD and attribution brain maps
-|    ├── faithfulness.py                            <- Faithfulness analysis of attributions
-|    ├── fig_brain-map-similarities.py              <- Figure 3 of the manuscript
-|    ├── fig_decoding-performance.py                <- Figure 1 of the manuscript
-|    ├── fig_faithfulness.py                        <- Figure 4 of the manuscript
-|    ├── fig_sanity-checks.py                       <- Figure 5 of the manuscript
+|    ├── brain-map-similarities.py                  <- Similarity analysis of brain maps
+|    ├── faithfulness.py                            <- Faithfulness analysis
+|    ├── fig_brain-map-similarities.py              <- Figure 4 of the manuscript
+|    ├── fig_decoding-performance.py                <- Figure 2 of the manuscript
+|    ├── fig_faithfulness.py                        <- Figure 5 of the manuscript
+|    ├── fig_sanity-checks.py                       <- Figure 6 of the manuscript
 |    ├── glm-attributions_group-level.py            <- Group-level attribution GLM maps
 |    ├── glm-attributions_subject-level.py          <- Subject-level attribution GLM maps
 |    ├── glm-BOLD_group-level.py                    <- Group-level BOLD GLM maps
@@ -59,10 +57,10 @@ Find below an overview of the repository organization. Note that the results dir
 |    ├── meta-analysis.py                           <- Running meta-analysis with NeuroQuery
 |    ├── rearrange_hcp-source_to_BIDS.py            <- Re-format HCP source data to BIDS-like format
 |    ├── sanity-checks.py                           <- Sanity checks analysis
-|    ├── sfig_attribution-variance.py               <- Supplementary Figure 1
-|    ├── sfig_brain-map-correlation-similarity.py   <- Supplementary Figure 2
-|    ├── sfig_randomized-labels-performance.py      <- Supplementary Figure 3
-|    └── train.py                                   <- Training of 3D-CNN for a given dataset
+|    ├── sfig_attribution-variance.py               <- Appendix Figure 3
+|    ├── sfig_brain-map-correlation-similarity.py   <- Appendix Figure 2
+|    ├── sfig_randomized-labels-performance.py      <- Appendix Figure 4
+|    └── train.py                                   <- Training of 3D-CNN
 |
 └── results/
 |    ├── attributions           <- attribution data by dataset (as resulting from 'attribute.py')
@@ -71,7 +69,7 @@ Find below an overview of the repository organization. Note that the results dir
 |    ├── glm                    <- subject- and group-level GLM maps by dataset (as resulting from 'glm-*.py' scripts)
 |    ├── hyperopt               <- logging directory for hyper-parameter optimization by dataset (as resulting from 'hyperopt.py')
 |    ├── meta_analysis          <- results of meta-analysis by dataset (as resulting from 'meta_analysis.py' script)
-|    ├── mfx                    <- results of statistical modeling
+|    ├── regr                   <- results of statistical analysis
 |    ├── models                 <- model fitting runs for each dataset (as resulting from 'train.py')
 |    └── sanity_checks          <- results of sanity checks analysis by dataset (as resulting from 'sanity-checks.py') 
 ```
