@@ -83,7 +83,7 @@ def fig_faithfulness(config=None) -> None:
         faithfulness = pd.read_csv(faithfulness_path)
         chance_first_reached = pd.read_csv(chance_first_reached_path)
         chance_first_reached['task'] = task
-        # mfx_data.append(chance_first_reached)
+        # regr_data.append(chance_first_reached)
         fractions = np.sort(np.unique(faithfulness['fraction_occluded']))
         axs[0].axhline(
             y=chance_first_reached['chance'].mean(),
@@ -176,11 +176,11 @@ def fig_faithfulness(config=None) -> None:
             axs[1].set_xticklabels([])
 
         # compute mixed effects model
-        mfx_results_path = os.path.join(
-            config["mfx_dir"],
-            f'faithfulness-{task}_mfx-results.csv'
+        regr_results_path = os.path.join(
+            config["regr_dir"],
+            f'faithfulness-{task}_regr-results.csv'
         )
-        if not os.path.isfile(mfx_results_path):
+        if not os.path.isfile(regr_results_path):
             chance_first_reached = chance_first_reached[chance_first_reached['method'].isin(method_ordering)]
             chance_first_reached = pd.get_dummies(chance_first_reached, columns=['method'])
             colname_mapper = {
@@ -195,20 +195,20 @@ def fig_faithfulness(config=None) -> None:
             print(
                 f'\nComputing regression model:\n\t{model_string}\n'
             )
-            mfx_model = bmb.Model(model_string, chance_first_reached)
+            regr_model = bmb.Model(model_string, chance_first_reached)
 
             n_tune = 5000
             converged = False
             while not converged:
-                results = mfx_model.fit(
+                results = regr_model.fit(
                     draws=5000,
                     tune=n_tune,
                     chains=4,
                     random_seed=config['seed']
                 )
-                mfx_result = az.summary(results)
+                regr_result = az.summary(results)
 
-                if all(np.abs(mfx_result['r_hat']-1) < .05):
+                if all(np.abs(regr_result['r_hat']-1) < .05):
                     converged = True
                 
                 n_tune += 5000
@@ -216,27 +216,27 @@ def fig_faithfulness(config=None) -> None:
             az.plot_trace(results);
             plt.tight_layout()
             os.makedirs(
-                config["mfx_dir"],
+                config["regr_dir"],
                 exist_ok=True
             )
             plt.savefig(
                 fname=os.path.join(
-                    config["mfx_dir"],
-                    f'faithfulness-{task}_mfx-trace.png'
+                    config["regr_dir"],
+                    f'faithfulness-{task}_regr-trace.png'
                 ),
                 dpi=300
             )
-            mfx_result.to_csv(mfx_results_path)
+            regr_result.to_csv(regr_results_path)
 
         else:
-            mfx_result = pd.read_csv(mfx_results_path, index_col=0)
+            regr_result = pd.read_csv(regr_results_path, index_col=0)
 
         # plot indicator for meaningful differences
         for mi, method in enumerate(method_ordering):
 
             if method != 'DeepLift':
             
-                if not test_hdi(mfx_result.loc[method, ['hdi_3%','hdi_97%']]):
+                if not test_hdi(regr_result.loc[method, ['hdi_3%','hdi_97%']]):
                     axs[1].text(
                         s='*',
                         x=mi,
@@ -301,13 +301,13 @@ def get_argparse() -> argparse.ArgumentParser:
         help='path where figures are stored (default: figures)'
     )
     parser.add_argument(
-        '--mfx-dir',
+        '--regr-dir',
         metavar='DIR',
-        default='results/mfx',
+        default='results/regr',
         type=str,
         required=False,
         help='path where results of mixed effects analysis are stored '
-             '(default: results/mfx)'
+             '(default: results/regr)'
     )
     parser.add_argument(
         "--seed",

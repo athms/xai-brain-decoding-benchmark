@@ -33,7 +33,7 @@ def fig_brain_maps_similarity(config=None) -> None:
         exist_ok=True
     )
     os.makedirs(
-        config["mfx_dir"],
+        config["regr_dir"],
         exist_ok=True
     )
 
@@ -60,7 +60,7 @@ def fig_brain_maps_similarity(config=None) -> None:
     ]
 
     # collect data for mixed effects model
-    mfx_data = []
+    regr_data = []
 
     for task_i, (task, axs) in enumerate(
         zip(
@@ -132,7 +132,7 @@ def fig_brain_maps_similarity(config=None) -> None:
                 subject_means = plotting_df.groupby(
                     ['method', 'Reference', 'subject'])['mi'].mean().reset_index()
                 subject_means['task'] = task
-                mfx_data.append(subject_means)
+                regr_data.append(subject_means)
                 ax = sns.violinplot(
                     data=subject_means,
                     x="method",
@@ -151,11 +151,11 @@ def fig_brain_maps_similarity(config=None) -> None:
 
                 for ri, reference in enumerate(subject_means['Reference'].unique()):
                     # compute mixed effects model
-                    mfx_results_path = os.path.join(
-                        config["mfx_dir"],
-                        f'brain-map-similarities-{task}_ref-{reference}_mfx-results.csv'
+                    regr_results_path = os.path.join(
+                        config["regr_dir"],
+                        f'brain-map-similarities-{task}_ref-{reference}_regr-results.csv'
                     )
-                    if not os.path.isfile(mfx_results_path):
+                    if not os.path.isfile(regr_results_path):
                         subject_means_ref = subject_means[subject_means['Reference']==reference].copy()
                         subject_means_ref = subject_means_ref[subject_means_ref['method'].isin(method_ordering)]
                         subject_means_ref = pd.get_dummies(subject_means_ref, columns=['method'])
@@ -171,20 +171,20 @@ def fig_brain_maps_similarity(config=None) -> None:
                         print(
                             f'\nComputing regression model for {reference} reference:\n\t{model_string}\n'
                         )
-                        mfx_model = bmb.Model(model_string, subject_means_ref)
+                        regr_model = bmb.Model(model_string, subject_means_ref)
 
                         n_tune = 5000
                         converged = False
                         while not converged:
-                            results = mfx_model.fit(
+                            results = regr_model.fit(
                                 draws=5000,
                                 tune=n_tune,
                                 chains=4,
                                 random_seed=config['seed']
                             )
-                            mfx_result = az.summary(results)
+                            regr_result = az.summary(results)
 
-                            if all(np.abs(mfx_result['r_hat']-1) < .05):
+                            if all(np.abs(regr_result['r_hat']-1) < .05):
                                 converged = True
                             
                             n_tune += 5000
@@ -193,22 +193,22 @@ def fig_brain_maps_similarity(config=None) -> None:
                         plt.tight_layout()
                         plt.savefig(
                             fname=os.path.join(
-                                config["mfx_dir"],
-                                f'brain-map-similarities-{task}_ref-{reference}_mfx-trace.png'
+                                config["regr_dir"],
+                                f'brain-map-similarities-{task}_ref-{reference}_regr-trace.png'
                             ),
                             dpi=300
                         )
-                        mfx_result.to_csv(mfx_results_path)
+                        regr_result.to_csv(regr_results_path)
 
                     else:
-                        mfx_result = pd.read_csv(mfx_results_path, index_col=0)
+                        regr_result = pd.read_csv(regr_results_path, index_col=0)
 
                     # plot indicator for meaningful differences
                     for mi, method in enumerate(method_ordering):
 
                         if method != 'DeepLift': # DeepLift is our baseline
                         
-                            if 0 < mfx_result.loc[method, 'hdi_3%']:
+                            if 0 < regr_result.loc[method, 'hdi_3%']:
                                 ax.text(
                                     s='*',
                                     x=mi-0.2 if ri==0 else mi+0.2,
@@ -277,41 +277,41 @@ def fig_brain_maps_similarity(config=None) -> None:
     )
 
     # compute mixed effects model
-    mfx_results_path = os.path.join(
-        config["mfx_dir"],
-        'brain-map-similarities_mfx-results.csv'
+    regr_results_path = os.path.join(
+        config["regr_dir"],
+        'brain-map-similarities_regr-results.csv'
     )
-    if not os.path.isfile(mfx_results_path):
-        mfx_data = pd.concat(mfx_data)
-        mfx_data = mfx_data[mfx_data['method'].isin(method_ordering)]
-        mfx_data = pd.get_dummies(mfx_data, columns=['method'])
+    if not os.path.isfile(regr_results_path):
+        regr_data = pd.concat(regr_data)
+        regr_data = regr_data[regr_data['method'].isin(method_ordering)]
+        regr_data = pd.get_dummies(regr_data, columns=['method'])
         colname_mapper = {
             c: c.split('method_')[1]
-            for c in mfx_data.columns
+            for c in regr_data.columns
             if 'method' in c
         }
-        mfx_data.rename(columns=colname_mapper, inplace=True)
-        mfx_data['DeepLift'] = 0
-        mfx_effects = [m for m in method_ordering if m!='DeepLift'] # DeepLift is the reference method
-        fixed_effects = " + ".join(mfx_effects)
+        regr_data.rename(columns=colname_mapper, inplace=True)
+        regr_data['DeepLift'] = 0
+        regr_effects = [m for m in method_ordering if m!='DeepLift'] # DeepLift is the reference method
+        fixed_effects = " + ".join(regr_effects)
         model_string = f"mi ~ {fixed_effects} + ({fixed_effects}|task)"
         print(
             f'\nComputing mixed effects model:\n\t{model_string}\n'
         )
-        mfx_model = bmb.Model(model_string, mfx_data)
+        regr_model = bmb.Model(model_string, regr_data)
         
         n_tune = 5000
         converged = False
         while not converged:
-            results = mfx_model.fit(
+            results = regr_model.fit(
                 draws=5000,
                 tune=n_tune,
                 chains=4,
                 random_seed=config['seed']
             )
-            mfx_result = az.summary(results)
+            regr_result = az.summary(results)
             
-            if all(np.abs(mfx_result['r_hat']-1) < .05):
+            if all(np.abs(regr_result['r_hat']-1) < .05):
                 converged = True
             
             n_tune += 5000
@@ -319,22 +319,22 @@ def fig_brain_maps_similarity(config=None) -> None:
         az.plot_trace(results);
         plt.tight_layout()
         os.makedirs(
-            config["mfx_dir"],
+            config["regr_dir"],
             exist_ok=True
         )
         plt.savefig(
             fname=os.path.join(
-                config["mfx_dir"],
-                'brain-map-similarities_mfx-trace.png'
+                config["regr_dir"],
+                'brain-map-similarities_regr-trace.png'
             ),
             dpi=300
         )
-        mfx_result.to_csv(mfx_results_path)
+        regr_result.to_csv(regr_results_path)
     
     else:
-        mfx_result = pd.read_csv(mfx_results_path)
+        regr_result = pd.read_csv(regr_results_path)
 
-    print(mfx_result)
+    print(regr_result)
 
     return fig
 
@@ -352,13 +352,13 @@ def get_argparse() -> argparse.ArgumentParser:
         help='path where figures are stored (default: figures/)'
     )
     parser.add_argument(
-        '--mfx-dir',
+        '--regr-dir',
         metavar='DIR',
-        default='results/mfx',
+        default='results/regr',
         type=str,
         required=False,
         help='path where results of mixed effects analysis are stored '
-             '(default: results/mfx)'
+             '(default: results/regr)'
     )
     parser.add_argument(
         '--brain-maps-similarity-base-dir',

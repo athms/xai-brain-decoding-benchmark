@@ -56,7 +56,7 @@ def fig_sanity_checks(config=None) -> None:
     ]
 
     # collect data for mixed effects model
-    mfx_data = {
+    regr_data = {
         'randomized_data': [],
         'randomized_model': []
     }
@@ -88,7 +88,7 @@ def fig_sanity_checks(config=None) -> None:
         ).mi.mean().groupby(
             ["method", "fitting_run"]
         ).mean().reset_index()
-        mfx_data['randomized_data'].append(randomized_label_means)
+        regr_data['randomized_data'].append(randomized_label_means)
         sns.swarmplot(
             data=randomized_label_means,
             x="method",
@@ -109,11 +109,11 @@ def fig_sanity_checks(config=None) -> None:
         axs[0].axhline(0, lw=1, ls='--', color='gray')
 
         # compute mixed effects model
-        mfx_results_path = os.path.join(
-            config["mfx_dir"],
-            f'sanity-checks-random-data-{task}_mfx-results.csv'
+        regr_results_path = os.path.join(
+            config["regr_dir"],
+            f'sanity-checks-random-data-{task}_regr-results.csv'
         )
-        if not os.path.isfile(mfx_results_path):
+        if not os.path.isfile(regr_results_path):
             randomized_label_means = randomized_label_means[randomized_label_means['method'].isin(method_ordering)]
             randomized_label_means = pd.get_dummies(randomized_label_means, columns=['method'])
             colname_mapper = {
@@ -128,20 +128,20 @@ def fig_sanity_checks(config=None) -> None:
             print(
                 f'\nComputing regression model:\n\t{model_string}\n'
             )
-            mfx_model = bmb.Model(model_string, randomized_label_means)
+            regr_model = bmb.Model(model_string, randomized_label_means)
 
             n_tune = 5000
             converged = False
             while not converged:
-                results = mfx_model.fit(
+                results = regr_model.fit(
                     draws=5000,
                     tune=n_tune,
                     chains=4,
                     random_seed=config['seed']
                 )
-                mfx_result = az.summary(results)
+                regr_result = az.summary(results)
 
-                if all(np.abs(mfx_result['r_hat']-1) < .05):
+                if all(np.abs(regr_result['r_hat']-1) < .05):
                     converged = True
                 
                 n_tune += 5000
@@ -150,22 +150,22 @@ def fig_sanity_checks(config=None) -> None:
             plt.tight_layout()
             plt.savefig(
                 fname=os.path.join(
-                    config["mfx_dir"],
-                    f'sanity-checks-random-data-{task}_mfx-trace.png'
+                    config["regr_dir"],
+                    f'sanity-checks-random-data-{task}_regr-trace.png'
                 ),
                 dpi=300
             )
-            mfx_result.to_csv(mfx_results_path)
+            regr_result.to_csv(regr_results_path)
 
         else:
-            mfx_result = pd.read_csv(mfx_results_path, index_col=0)
+            regr_result = pd.read_csv(regr_results_path, index_col=0)
 
         # plot indicator for meaningful differences
         for mi, method in enumerate(method_ordering):
 
             if method != 'DeepLift':
             
-                if 0 > mfx_result.loc[method, 'hdi_97%']:
+                if 0 > regr_result.loc[method, 'hdi_97%']:
                     axs[0].text(
                         s='*',
                         x=mi,
@@ -205,7 +205,7 @@ def fig_sanity_checks(config=None) -> None:
         ).mi.mean().groupby(
             ["method", "fitting_run"]
         ).mean().reset_index()
-        mfx_data['randomized_model'].append(randomized_model_means)
+        regr_data['randomized_model'].append(randomized_model_means)
         sns.swarmplot(
             data=randomized_model_means,
             x="method",
@@ -225,11 +225,11 @@ def fig_sanity_checks(config=None) -> None:
         axs[1].axhline(0, lw=1, ls='--', color='gray')
 
         # compute mixed effects model
-        mfx_results_path = os.path.join(
-            config["mfx_dir"],
-            f'sanity-checks-random-model-{task}_mfx-results.csv'
+        regr_results_path = os.path.join(
+            config["regr_dir"],
+            f'sanity-checks-random-model-{task}_regr-results.csv'
         )
-        if not os.path.isfile(mfx_results_path):
+        if not os.path.isfile(regr_results_path):
             randomized_model_means = randomized_model_means[randomized_model_means['method'].isin(method_ordering)]
             randomized_model_means = pd.get_dummies(randomized_model_means, columns=['method'])
             colname_mapper = {
@@ -244,20 +244,20 @@ def fig_sanity_checks(config=None) -> None:
             print(
                 f'\nComputing regression model:\n\t{model_string}\n'
             )
-            mfx_model = bmb.Model(model_string, randomized_model_means)
+            regr_model = bmb.Model(model_string, randomized_model_means)
 
             n_tune = 5000
             converged = False
             while not converged:
-                results = mfx_model.fit(
+                results = regr_model.fit(
                     draws=5000,
                     tune=n_tune,
                     chains=4,
                     random_seed=config['seed']
                 )
-                mfx_result = az.summary(results)
+                regr_result = az.summary(results)
 
-                if all(np.abs(mfx_result['r_hat']-1) < .05):
+                if all(np.abs(regr_result['r_hat']-1) < .05):
                     converged = True
                 
                 n_tune += 5000
@@ -266,22 +266,22 @@ def fig_sanity_checks(config=None) -> None:
             plt.tight_layout()
             plt.savefig(
                 fname=os.path.join(
-                    config["mfx_dir"],
-                    f'sanity-checks-random-model-{task}_mfx-trace.png'
+                    config["regr_dir"],
+                    f'sanity-checks-random-model-{task}_regr-trace.png'
                 ),
                 dpi=300
             )
-            mfx_result.to_csv(mfx_results_path)
+            regr_result.to_csv(regr_results_path)
 
         else:
-            mfx_result = pd.read_csv(mfx_results_path, index_col=0)
+            regr_result = pd.read_csv(regr_results_path, index_col=0)
 
         # plot indicator for meaningful differences
         for mi, method in enumerate(method_ordering):
 
             if method != 'DeepLift':
             
-                if 0 > mfx_result.loc[method, 'hdi_97%']:
+                if 0 > regr_result.loc[method, 'hdi_97%']:
                     axs[1].text(
                         s='*',
                         x=mi,
@@ -341,13 +341,13 @@ def get_argparse() -> argparse.ArgumentParser:
         help='path where figures are stored (default: figures/)'
     )
     parser.add_argument(
-        '--mfx-dir',
+        '--regr-dir',
         metavar='DIR',
-        default='results/mfx',
+        default='results/regr',
         type=str,
         required=False,
         help='path where results of mixed effects analysis are stored '
-             '(default: results/mfx)'
+             '(default: results/regr)'
     )
     parser.add_argument(
         '--sanity-checks-base-dir',
