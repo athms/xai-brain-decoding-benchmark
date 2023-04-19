@@ -1,5 +1,9 @@
 # Benchmarking explanation methods for mental state decoding with deep learning models
 
+
+![](figures/Fig-0_attribution-methods.jpg)
+
+
 ## Overview
 
 This repository contains the code for: 
